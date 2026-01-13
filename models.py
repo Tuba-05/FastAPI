@@ -31,10 +31,6 @@ class QuizResults(model):
     user_id = Column(Integer, nullable=False)  # Foreign key to User.id
     total_marks = Column(Integer, nullable=False)
     score = Column(Integer, nullable=False)
-=======
-from sqlalchemy import Column, Integer, String, DateTime
-from database import model
-from datetime import datetime
 
 class User(model):
     __tablename__ = "users"
