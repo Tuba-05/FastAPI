@@ -1,5 +1,7 @@
+# app/session/session.py
+
 # this file purpose is to provide database session dependency
-from database import SessionLocal
+from databases.database import SessionLocal
 # from sqlalchemy.orm import Session
 
 def get_db():
