@@ -1,4 +1,4 @@
-# app/schemas/schemas.py
+# app/schemas/auth_schemas.py
 
 # -------------------------- Pydantic models ---------------------------
 from pydantic import BaseModel, EmailStr, Field

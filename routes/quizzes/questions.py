@@ -1,0 +1,41 @@
+# app/router/quizzes/questions.py
+from fastapi import APIRouter, Depends, HTTPException
+# sqlalchemy imports
+from sqlalchemy.exc import SQLAlchemyError, OperationalError
+from sqlalchemy.orm import Session
+# files imports
+from models.models import Questions
+from databases.session import get_db
+from schemas.quizzes_schemas import AddQuestions
+from utils.responses import success_response, error_response
+from logs.logs import get_logger
+
+logger = get_logger(__name__)
+
+questions_route = APIRouter(prefix="/route", tags=["Route"])
+
+@questions_route.post("online-exams/add-questions/")
+def add_question(questions_data = AddQuestions, db: Session= Depends(get_db)):
+    try:
+        quetsions_added = Questions(question_text= questions_data.questionText, option_a= questions_data.A, option_b= questions_data.B,
+                                    option_c= questions_data.C, option_d= questions_data.D, correct_option= questions_data.correct_one)
+        db.add(quetsions_added)
+        db.commit()
+        logger.info("✅Questions added to DB.")
+        return success_response("User registered successfully", data={"question_id": quetsions_added.id}, status_code=201)
+    
+    except OperationalError:
+        # Database unavailable
+        logger.critical("⚠️Database unavailable (OperationalError)", exc_info=True)
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    except SQLAlchemyError:
+        # General database error
+        logger.error("❌Database error (SQLAlchemyError)", exc_info=True)
+        raise HTTPException(status_code=500, detail="Database error")
+
+    except Exception as e:
+        # Unexpected errors
+        logger.exception("❌Unhandled server exception")
+        return error_response("Internal server error")
+

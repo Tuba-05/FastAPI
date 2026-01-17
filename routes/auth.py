@@ -1,4 +1,4 @@
-# app/router/routes.py
+# app/router/auth.py
 from fastapi import APIRouter, Depends, HTTPException
 # sqlalchemy imports
 from sqlalchemy.exc import SQLAlchemyError, OperationalError
@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 # files imports
 from models.models import User
 from databases.session import get_db
-from schemas.schemas import UserRegister, UserEmail, PasswordUpdate, UserLogin
+from schemas.auth_schemas import UserRegister, UserEmail, PasswordUpdate, UserLogin
 from utils.responses import success_response, error_response
 from logs.logs import get_logger
 # other imports
@@ -14,41 +14,41 @@ from pwdlib import PasswordHash
 
 logger = get_logger(__name__)
 
-router = APIRouter(prefix="/route", tags=["Route"])
+auth_route = APIRouter(prefix="/route", tags=["Route"])
 
 password_hash = PasswordHash.recommended() # creating a password hashing object 
 
 # ---------------- Registeration ---------------------
-@router.post("online-exams/users/register/" )
+@auth_route.post("online-exams/users/register/" )
 def register(user_data: UserRegister, db: Session = Depends(get_db) ):
     
     try: # saving user
         registered_user = User(name = user_data.name, admin_secret_key= user_data.admin_secret_key,
                                email = user_data.email, password = password_hash.hash(user_data.password) )
         print(user_data.name, user_data.email, user_data.password, user_data.admin_secret_key)
-        db.session.add(registered_user)
-        db.session.commit()
+        db.add(registered_user)
+        db.commit()
         logger.info("✅User registered successfully")
         return success_response("User registered successfully", data={"email": registered_user.email}, status_code=201)
     
     except OperationalError:
         # Database unavailable
-        logger.critical("Database unavailable (OperationalError)", exc_info=True)
+        logger.critical("⚠️Database unavailable (OperationalError)", exc_info=True)
         raise HTTPException(status_code=503, detail="Database unavailable")
 
     except SQLAlchemyError:
         # General database error
-        logger.error("Database error (SQLAlchemyError)", exc_info=True)
+        logger.error("❌Database error (SQLAlchemyError)", exc_info=True)
         raise HTTPException(status_code=500, detail="Database error")
 
     except Exception as e:
         # Unexpected errors
-        logger.exception("Unhandled server exception")
+        logger.exception("❌Unhandled server exception")
         return error_response("Internal server error")
 
 
 # ---------------- Login ---------------------
-@router.post("online-exams/users/login/")
+@auth_route.post("online-exams/users/login/")
 async def login(user_data: UserLogin, db: Session = Depends(get_db)):
     try:
         login_user = db.query(User).filter(User.email == user_data.email, 
@@ -60,20 +60,22 @@ async def login(user_data: UserLogin, db: Session = Depends(get_db)):
     
     except OperationalError:
         # Database unavailable
+        logger.critical("⚠️Database unavailable (OperationalError)", exc_info=True)
         raise HTTPException(status_code=503, detail="Database unavailable")
 
     except SQLAlchemyError:
         # General database error
+        logger.error("❌Database error (SQLAlchemyError)", exc_info=True)
         raise HTTPException(status_code=500, detail="Database error")
 
     except Exception as e:
         # Unexpected errors
-        print("error", e)
+        logger.exception("❌Unhandled server exception")
         return error_response("Internal server error")
 
 
 # ---------------- Logout ---------------------
-@router.post("online-exams/users/logout/")
+@auth_route.post("online-exams/users/logout/")
 async def logout(user_email: UserEmail, db: Session= Depends(get_db)):
     try:
         logout_user = db.query(User).filter(User.email == user_email).first()
@@ -85,20 +87,22 @@ async def logout(user_email: UserEmail, db: Session= Depends(get_db)):
     
     except OperationalError:
         # Database unavailable
+        logger.critical("⚠️Database unavailable (OperationalError)", exc_info=True)
         raise HTTPException(status_code=503, detail="Database unavailable")
 
     except SQLAlchemyError:
         # General database error
+        logger.error("❌Database error (SQLAlchemyError)", exc_info=True)
         raise HTTPException(status_code=500, detail="Database error")
 
     except Exception as e:
         # Unexpected errors
-        print("error", e)
+        logger.exception("❌Unhandled server exception")
         return error_response("Internal server error")
     
 
 # ---------------- Update Password ---------------------    
-@router.post("online-exams/users/password")
+@auth_route.post("online-exams/users/password")
 async def update_password(user_data: PasswordUpdate, db: Session= Depends(get_db)):
     try:
         is_user_valid = db.query(User).filter(User.email == user_data.email).first()
@@ -112,14 +116,16 @@ async def update_password(user_data: PasswordUpdate, db: Session= Depends(get_db
            
     except OperationalError:
         # Database unavailable
+        logger.critical("⚠️Database unavailable (OperationalError)", exc_info=True)
         raise HTTPException(status_code=503, detail="Database unavailable")
 
     except SQLAlchemyError:
         # General database error
+        logger.error("❌Database error (SQLAlchemyError)", exc_info=True)
         raise HTTPException(status_code=500, detail="Database error")
 
     except Exception as e:
         # Unexpected errors
-        print("error", e)
+        logger.exception("❌Unhandled server exception")
         return error_response("Internal server error")
 
