@@ -1,18 +1,23 @@
 # app/utils/responses.py
 
-from fastapi import status
+from fastapi.responses import JSONResponse
 
-def success_response(message: str, data=None):
-    return {
-        "status": status.HTTP_200_OK,
-        "message": message,
-        "data": data
-    }
+def success_response(message: str, data= None, success= True, status_code= 200):
+    return JSONResponse(
+        status_code=status_code,
+        content={
+            "success" : success,
+            "message": message,
+            "data": data
+        })
 
-def error_response(message: str, status_code=status.HTTP_400_BAD_REQUEST):
-    return {
-        "status": status_code,
+
+def error_response(message: str, success= False, status_code= 400):
+    return JSONResponse(
+        status_code= status_code,
+        content={
+        "success": success,
         "message": message,
         "data": None
-    }
+    })
 

@@ -1,7 +1,8 @@
 # app/schemas/schemas.py
 
 # -------------------------- Pydantic models ---------------------------
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
+from typing import List, Dict
 
 # Using EmailStr (requires email-validator) ensures valid email formats
 class UserRegister(BaseModel):
@@ -10,11 +11,15 @@ class UserRegister(BaseModel):
     password: str
     admin_secret_key: str | None = None
 
-class UserLogout(BaseModel):
-    email: EmailStr
-    password: str 
-
 class UserLogin(BaseModel):
     email: EmailStr
-    password: str 
+    password : str
+    
+class UserEmail(BaseModel):
+    email: EmailStr
+
+class PasswordUpdate(BaseModel):
+    email: EmailStr
+    new_password: str = Field(max_length=7)
+
 
