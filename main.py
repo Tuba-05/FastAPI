@@ -16,7 +16,7 @@ app = FastAPI() # app
 
 models.model.metadata.create_all(bind=engine) #Creates tables automatically if they don’t exist
 
-app.include_router(auth.auth_route) #
+app.include_router(auth.auth_route) 
 app.include_router(quizzes.quiz_route)
 
 

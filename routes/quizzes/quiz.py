@@ -23,16 +23,16 @@ def quiz(quiz_data: TestTaken, db: Session= Depends(get_db)):
         
     except OperationalError:
         # Database unavailable
-        logger.critical("⚠️Database unavailable (OperationalError)", exc_info=True)
+        logger.critical("Database unavailable (OperationalError)", exc_info=True)
         raise HTTPException(status_code=503, detail="Database unavailable")
 
     except SQLAlchemyError:
         # General database error
-        logger.error("❌Database error (SQLAlchemyError)", exc_info=True)
+        logger.error("Database error (SQLAlchemyError)", exc_info=True)
         raise HTTPException(status_code=500, detail="Database error")
 
     except Exception as e:
         # Unexpected errors
-        logger.exception("❌Unhandled server exception")
+        logger.exception("Unhandled server exception")
         return error_response("Internal server error")
     

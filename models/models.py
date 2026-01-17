@@ -9,7 +9,7 @@ class User(model):
     admin_secret_key = Column(String(50), nullable=True)  # Only for admin users
     name = Column(String(100), nullable=False)
     email = Column(String(20), unique=True, nullable=False)
-    password = Column(String(7), nullable=False)
+    password = Column(String(255), nullable=False)
     modified_at = Column(DateTime, default=datetime.utcnow,) # utc, global time zone
     created_at = Column(DateTime, default=datetime.utcnow)
 

@@ -28,22 +28,22 @@ def register(user_data: UserRegister, db: Session = Depends(get_db) ):
         print(user_data.name, user_data.email, user_data.password, user_data.admin_secret_key)
         db.add(registered_user)
         db.commit()
-        logger.info("✅User registered successfully")
+        logger.info("User registered successfully")
         return success_response("User registered successfully", data={"email": registered_user.email}, status_code=201)
     
     except OperationalError:
         # Database unavailable
-        logger.critical("⚠️Database unavailable (OperationalError)", exc_info=True)
+        logger.critical("Database unavailable (OperationalError)", exc_info=True)
         raise HTTPException(status_code=503, detail="Database unavailable")
 
     except SQLAlchemyError:
         # General database error
-        logger.error("❌Database error (SQLAlchemyError)", exc_info=True)
+        logger.error("Database error (SQLAlchemyError)", exc_info=True)
         raise HTTPException(status_code=500, detail="Database error")
 
     except Exception as e:
         # Unexpected errors
-        logger.exception("❌Unhandled server exception")
+        logger.exception("Unhandled server exception")
         return error_response("Internal server error")
 
 
@@ -51,26 +51,29 @@ def register(user_data: UserRegister, db: Session = Depends(get_db) ):
 @auth_route.post("online-exams/users/login/")
 async def login(user_data: UserLogin, db: Session = Depends(get_db)):
     try:
-        login_user = db.query(User).filter(User.email == user_data.email, 
-                                           User.password == password_hash.hash(user_data.password)).first()
+        login_user = db.query(User).filter(User.email == user_data.email).first()
         if not login_user:
             raise HTTPException(status_code= 404, detail= "User not found")
-        logger.info("✅User logged in successfully")
+        # Verify password using pwblib
+        if not password_hash.verify(user_data.password, login_user.password):
+            raise HTTPException(status_code=401, detail="Invalid password")
+        
+        logger.info("User logged in successfully")
         return success_response("Suceesfully logged in.", data= {"email": login_user.email}, status_code=200)
     
     except OperationalError:
         # Database unavailable
-        logger.critical("⚠️Database unavailable (OperationalError)", exc_info=True)
+        logger.critical("Database unavailable (OperationalError)", exc_info=True)
         raise HTTPException(status_code=503, detail="Database unavailable")
 
     except SQLAlchemyError:
         # General database error
-        logger.error("❌Database error (SQLAlchemyError)", exc_info=True)
+        logger.error("Database error (SQLAlchemyError)", exc_info=True)
         raise HTTPException(status_code=500, detail="Database error")
 
     except Exception as e:
         # Unexpected errors
-        logger.exception("❌Unhandled server exception")
+        logger.exception("Unhandled server exception")
         return error_response("Internal server error")
 
 
@@ -82,22 +85,22 @@ async def logout(user_email: UserEmail, db: Session= Depends(get_db)):
         if not logout_user: 
             raise HTTPException(status_code= 404, detail= "User not found")
         db.delete(logout_user)
-        logger.info("✅User logged out successfully")
+        logger.info("User logged out successfully")
         return success_response("Logged out successfully", data={"email": logout_user.email}, status_code=200)
     
     except OperationalError:
         # Database unavailable
-        logger.critical("⚠️Database unavailable (OperationalError)", exc_info=True)
+        logger.critical("Database unavailable (OperationalError)", exc_info=True)
         raise HTTPException(status_code=503, detail="Database unavailable")
 
     except SQLAlchemyError:
         # General database error
-        logger.error("❌Database error (SQLAlchemyError)", exc_info=True)
+        logger.error("Database error (SQLAlchemyError)", exc_info=True)
         raise HTTPException(status_code=500, detail="Database error")
 
     except Exception as e:
         # Unexpected errors
-        logger.exception("❌Unhandled server exception")
+        logger.exception("Unhandled server exception")
         return error_response("Internal server error")
     
 
@@ -111,21 +114,21 @@ async def update_password(user_data: PasswordUpdate, db: Session= Depends(get_db
         is_user_valid.password = user_data.new_password
         db.commit()
         db.refresh(is_user_valid)
-        logger.info("✅User password updated successfully")
+        logger.info("User password updated successfully")
         return success_response("Password updated!", data={"email": user_data.email}, status_code=200)
            
     except OperationalError:
         # Database unavailable
-        logger.critical("⚠️Database unavailable (OperationalError)", exc_info=True)
+        logger.critical("Database unavailable (OperationalError)", exc_info=True)
         raise HTTPException(status_code=503, detail="Database unavailable")
 
     except SQLAlchemyError:
         # General database error
-        logger.error("❌Database error (SQLAlchemyError)", exc_info=True)
+        logger.error("Database error (SQLAlchemyError)", exc_info=True)
         raise HTTPException(status_code=500, detail="Database error")
 
     except Exception as e:
         # Unexpected errors
-        logger.exception("❌Unhandled server exception")
+        logger.exception("Unhandled server exception")
         return error_response("Internal server error")
 
