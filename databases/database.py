@@ -19,9 +19,12 @@ DB_SSL_CA_PATH = os.getenv("DB_SSL_CA_PATH")
 DATABASE_URL = f"mysql+mysqlconnector://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_DBNAME}"
 
 engine = create_engine( DATABASE_URL,
+                        pool_size=10,
+                        max_overflow=20,
                         connect_args={ "ssl_ca": DB_SSL_CA_PATH  # path to your CA certificate
                         }, echo=True  # shows SQL queries in console (use False in production)
 )
+
 # 2. Create Session
 SessionLocal = sessionmaker(autocommit=False, # Disables automatic transaction commits.
                             autoflush=False, # Ensures changes are not automatically saved to the database. 

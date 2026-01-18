@@ -18,6 +18,7 @@ models.model.metadata.create_all(bind=engine) #Creates tables automatically if t
 
 app.include_router(auth.auth_route) 
 app.include_router(quizzes.quiz_route)
+app.include_router(question.questions_route)
 
 
 @app.get("/")
