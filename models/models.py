@@ -10,8 +10,8 @@ class User(model):
     name = Column(String(100), nullable=False)
     email = Column(String(20), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
-    modified_at = Column(DateTime, default=datetime.utcnow,) # utc, global time zone
-    created_at = Column(DateTime, default=datetime.utcnow)
+    modified_at = Column(DateTime, default=datetime.utc,) # utc, global time zone
+    created_at = Column(DateTime, default=datetime.utc)
 
 
 class Questions(model):
@@ -23,8 +23,8 @@ class Questions(model):
     option_c = Column(String(50), nullable=False)
     option_d = Column(String(50), nullable=False)
     correct_option = Column(String(50), nullable=False)  # e.g., 'A', 'B', 'C', 'D'
-    modified_at = Column(DateTime, default=datetime.utcnow,)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    modified_at = Column(DateTime, default=datetime.utc,)
+    created_at = Column(DateTime, default=datetime.utc)
 
 
 class QuizResults(model):
@@ -33,4 +33,6 @@ class QuizResults(model):
     user_id = Column(Integer, nullable=False)  # Foreign key to User.id
     total_marks = Column(Integer, nullable=False)
     score = Column(Integer, nullable=False)
+    modified_at = Column(DateTime, default=datetime.utc,)
+    created_at = Column(DateTime, default=datetime.utc)
 

@@ -9,12 +9,19 @@ from databases.session import get_db
 from schemas.quizzes_schemas import TestTaken
 from utils.responses import success_response, error_response
 from logs.logs import get_logger
+#  other imports
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 logger = get_logger(__name__)
+
+# Limiter instance to apply rate limiting based on client IP address
+limiter = Limiter(key_func=get_remote_address)
 
 quiz_route = APIRouter(prefix="/route", tags=["Route"])
 
 @quiz_route.post("online-exams/quizes/")
+@limiter.limit("1000/minute")
 def quiz(quiz_data: TestTaken, db: Session= Depends(get_db)):
     try:
         is_question_valid = db.query(Questions).filter(id== quiz_data.question_id).first()

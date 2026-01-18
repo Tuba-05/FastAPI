@@ -9,12 +9,20 @@ from databases.session import get_db
 from schemas.quizzes_schemas import AddQuestions
 from utils.responses import success_response, error_response
 from logs.logs import get_logger
+# other imports
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+
 
 logger = get_logger(__name__)
+
+# Limiter instance to apply rate limiting based on client IP address
+limiter = Limiter(key_func=get_remote_address)
 
 questions_route = APIRouter(prefix="/route", tags=["Route"])
 
 @questions_route.post("online-exams/add-questions/")
+@limiter.limit("100/minute")
 def add_question(questions_data = AddQuestions, db: Session= Depends(get_db)):
     try:
         quetsions_added = Questions(question_text= questions_data.questionText, option_a= questions_data.A, option_b= questions_data.B,
