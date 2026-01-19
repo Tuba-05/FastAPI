@@ -1,14 +1,14 @@
 # app/schemas/auth_schemas.py
 
 # -------------------------- Pydantic models ---------------------------
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, constr
 from typing import List, Dict
 
 # Using EmailStr (requires email-validator) ensures valid email formats
 class UserRegister(BaseModel):
     name: str
     email: EmailStr
-    password: str
+    password: constr(min_length=8)  # password must be at least 8 chars
     admin_secret_key: str | None = None
 
 class UserLogin(BaseModel):

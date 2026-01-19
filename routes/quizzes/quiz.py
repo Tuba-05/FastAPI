@@ -1,5 +1,5 @@
 # app/router/quizzes/quiz.py
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 # sqlalchemy imports
 from sqlalchemy.exc import SQLAlchemyError, OperationalError
 from sqlalchemy.orm import Session
@@ -22,7 +22,7 @@ quiz_route = APIRouter(prefix="/route", tags=["Route"])
 
 @quiz_route.post("online-exams/quizes/")
 @limiter.limit("1000/minute")
-def quiz(quiz_data: TestTaken, db: Session= Depends(get_db)):
+def quiz( request: Request, quiz_data: TestTaken, db: Session= Depends(get_db)):
     try:
         is_question_valid = db.query(Questions).filter(id== quiz_data.question_id).first()
         if not is_question_valid:

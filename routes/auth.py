@@ -1,6 +1,7 @@
 # app/router/auth.py
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials
+
 # sqlalchemy imports
 from sqlalchemy.exc import SQLAlchemyError, OperationalError
 from sqlalchemy.orm import Session
@@ -30,19 +31,22 @@ password_hash = PasswordHash.recommended() # creating a password hashing object
 # ---------------- Registeration ---------------------
 @auth_route.post("online-exams/users/register/" )
 @limiter.limit("5/minute")
-def register(user_data: UserRegister, db: Session = Depends(get_db) ):
+def register( request: Request, user_data: UserRegister, db: Session = Depends(get_db) ):
     """ Registers a new user.
         Hashes password before saving.
         Rate limited to 5 requests per minute per IP. """
     try: # saving user
+        if db.query(User).filter(User.email== user_data.email).first():
+            return error_response(message= "User already registered ", status_code=409 )
+        
         registered_user = User(name = user_data.name, admin_secret_key= user_data.admin_secret_key,
                                email = user_data.email, password = password_hash.hash(user_data.password) )
         print(user_data.name, user_data.email, user_data.password, user_data.admin_secret_key)
         db.add(registered_user)
         db.commit()
         logger.info("User registered successfully")
-        return success_response("User registered successfully", data={"email": registered_user.email}, status_code=201)
-    
+        return success_response(message="User registered successfully", data={"email": registered_user.email}, status_code=201)
+
     except OperationalError:
         # Database unavailable
         logger.critical("Database unavailable (OperationalError)", exc_info=True)
@@ -53,7 +57,7 @@ def register(user_data: UserRegister, db: Session = Depends(get_db) ):
         logger.error("Database error (SQLAlchemyError)", exc_info=True)
         raise HTTPException(status_code=500, detail="Database error")
 
-    except Exception as e:
+    except Exception:
         # Unexpected errors
         logger.exception("Unhandled server exception")
         return error_response("Internal server error")
@@ -62,7 +66,7 @@ def register(user_data: UserRegister, db: Session = Depends(get_db) ):
 # ---------------- Login ---------------------
 @auth_route.post("online-exams/users/login/")
 @limiter.limit("5/minute")  # Limit login attempts to 5 requests per minute per IP
-async def login(user_data: UserLogin, db: Session = Depends(get_db)):
+async def login( request: Request, user_data: UserLogin, db: Session = Depends(get_db)):
     """ Authenticates a user and returns a JWT access token.
         Steps:
         1. Fetch user by email
@@ -70,12 +74,12 @@ async def login(user_data: UserLogin, db: Session = Depends(get_db)):
         3. Generate and return JWT token """
     try:
         login_user = db.query(User).filter(User.email == user_data.email).first()
-        if not login_user:
-            raise HTTPException(status_code= 404, detail= "User not found")
+        # if not login_user:
+        #     return error_response(message= "User not found", status_code= 404)
         
         # Verify password using pwblib
-        if not password_hash.verify(user_data.password, login_user.password):
-            raise HTTPException(status_code=401, detail="Invalid password")
+        if not login_user or not password_hash.verify(user_data.password, login_user.password):
+            return error_response( message="Invalid email or password", status_code=401,)
         
         # Create JWT token containing user identity data
         access_token = create_access_token({ "user_id": login_user.id, "email": login_user.email })
@@ -88,7 +92,6 @@ async def login(user_data: UserLogin, db: Session = Depends(get_db)):
                                                                 "refresh_token": refresh_token, 
                                                                 "token_type": "bearer"}, 
                                                         status_code=200)
-    
     except OperationalError:
         # Database unavailable
         logger.critical("Database unavailable (OperationalError)", exc_info=True)
@@ -108,11 +111,11 @@ async def login(user_data: UserLogin, db: Session = Depends(get_db)):
 # ---------------- Logout ---------------------
 @auth_route.post("online-exams/users/logout/")
 @limiter.limit("5/minute")
-async def logout(user_email: UserEmail, db: Session= Depends(get_db)):
+async def logout( request: Request,user_email: UserEmail, db: Session= Depends(get_db)):
     try:
         logout_user = db.query(User).filter(User.email == user_email).first()
         if not logout_user: 
-            raise HTTPException(status_code= 404, detail= "User not found")
+            return error_response(message= "User not found", status_code= 404)
         # db.delete(logout_user)
         # db.commit()
         logger.info("User logged out successfully")
@@ -137,19 +140,19 @@ async def logout(user_email: UserEmail, db: Session= Depends(get_db)):
 # ---------------- Update Password ---------------------    
 @auth_route.post("online-exams/users/password")
 @limiter.limit("5/minute")
-async def update_password(user_data: PasswordUpdate, db: Session= Depends(get_db)):
+async def update_password(request: Request, user_data: PasswordUpdate, db: Session= Depends(get_db)):
     """ Updates a user's password.
         Rate-limited to prevent brute-force attacks. """
     try:
         is_user_valid = db.query(User).filter(User.email == user_data.email).first()
         if not is_user_valid:
-            raise HTTPException(status_code= 404, detail= "User not found")
+            return error_response(message="User not found", status_code= 404 )
         
         is_user_valid.password =  password_hash.hash(user_data.new_password)
         db.commit()
         db.refresh(is_user_valid)
         logger.info("User password updated successfully")
-        return success_response("Password updated!", data={"email": user_data.email}, status_code=200)
+        return success_response(message="Password updated!", data={"email": user_data.email}, status_code=200)
            
     except OperationalError:
         # Database unavailable
@@ -170,7 +173,7 @@ async def update_password(user_data: PasswordUpdate, db: Session= Depends(get_db
 # ---------------- Refresh Access Token ---------------------
 @auth_route.post("/online-exams/users/refresh")
 @limiter.limit("5/minute")
-async def refresh_access_token( credentials: HTTPAuthorizationCredentials = Depends(security)):
+async def refresh_access_token( request: Request, credentials: HTTPAuthorizationCredentials = Depends(security)):
     """ Refreshes the access token using a valid refresh token.
         Checks token signature, expiration, and type. """
     # Actual JWT string (refresh token)

@@ -1,5 +1,5 @@
 # app/router/quizzes/questions.py
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 # sqlalchemy imports
 from sqlalchemy.exc import SQLAlchemyError, OperationalError
 from sqlalchemy.orm import Session
@@ -23,7 +23,7 @@ questions_route = APIRouter(prefix="/route", tags=["Route"])
 
 @questions_route.post("online-exams/add-questions/")
 @limiter.limit("100/minute")
-def add_question(questions_data = AddQuestions, db: Session= Depends(get_db)):
+def add_question( request: Request,questions_data = AddQuestions, db: Session= Depends(get_db)):
     try:
         quetsions_added = Questions(question_text= questions_data.questionText, option_a= questions_data.A, option_b= questions_data.B,
                                     option_c= questions_data.C, option_d= questions_data.D, correct_option= questions_data.correct_one)
