@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 from typing import List, Dict
 
 class AddQuestions(BaseModel):
+    admin_key: str
     questionText: str
     A : str
     B : str

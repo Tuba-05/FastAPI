@@ -113,7 +113,7 @@ async def login( request: Request, user_data: UserLogin, db: Session = Depends(g
 @limiter.limit("5/minute")
 async def logout( request: Request,user_email: UserEmail, db: Session= Depends(get_db)):
     try:
-        logout_user = db.query(User).filter(User.email == user_email).first()
+        logout_user = db.query(User).filter(User.email == user_email.email).first()
         if not logout_user: 
             return error_response(message= "User not found", status_code= 404)
         # db.delete(logout_user)
@@ -144,13 +144,13 @@ async def update_password(request: Request, user_data: PasswordUpdate, db: Sessi
     """ Updates a user's password.
         Rate-limited to prevent brute-force attacks. """
     try:
-        is_user_valid = db.query(User).filter(User.email == user_data.email).first()
-        if not is_user_valid:
-            return error_response(message="User not found", status_code= 404 )
+        is_email_valid = db.query(User).filter(User.email == user_data.email).first()
+        if not is_email_valid:
+            return error_response(message="Invalid email", status_code= 401 )
         
-        is_user_valid.password =  password_hash.hash(user_data.new_password)
+        is_email_valid.password =  password_hash.hash(user_data.new_password)
         db.commit()
-        db.refresh(is_user_valid)
+        db.refresh(is_email_valid)
         logger.info("User password updated successfully")
         return success_response(message="Password updated!", data={"email": user_data.email}, status_code=200)
            

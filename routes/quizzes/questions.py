@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.exc import SQLAlchemyError, OperationalError
 from sqlalchemy.orm import Session
 # files imports
-from models.models import Questions
+from models.models import Questions, User
 from databases.session import get_db
 from schemas.quizzes_schemas import AddQuestions
 from utils.responses import success_response, error_response
@@ -24,14 +24,20 @@ questions_route = APIRouter(prefix="/route", tags=["Route"])
 @questions_route.post("online-exams/add-questions/")
 @limiter.limit("100/minute")
 def add_question( request: Request,questions_data = AddQuestions, db: Session= Depends(get_db)):
+    """ takes quiz questions data from admin.
+    """ 
     try:
-        quetsions_added = Questions(question_text= questions_data.questionText, option_a= questions_data.A, option_b= questions_data.B,
-                                    option_c= questions_data.C, option_d= questions_data.D, correct_option= questions_data.correct_one)
-        db.add(quetsions_added)
-        db.commit()
-        logger.info("Questions added to DB.")
-        return success_response("User registered successfully", data={"question_id": quetsions_added.id}, status_code=201)
-    
+        is_admin = db.query(User).filter(User.admin_secret_key == questions_data.admin_key).first()
+        if is_admin:
+            quetsions_added = Questions(question_text= questions_data.questionText, option_a= questions_data.A, 
+                                        option_b= questions_data.B, option_c= questions_data.C, 
+                                        option_d= questions_data.D, correct_option= questions_data.correct_one)
+            db.add(quetsions_added)
+            db.commit()
+            logger.info("Questions added to DB.")
+            return success_response("Questions successfully added to quiz", data={"question_id": quetsions_added.id}, status_code=201)
+        else:
+            return error_response("You are not allowed to add questions", status_code=403)
     except OperationalError:
         # Database unavailable
         logger.critical("Database unavailable (OperationalError)", exc_info=True)
