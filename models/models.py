@@ -22,7 +22,7 @@ class Questions(model):
     option_b = Column(String(50), nullable=False)
     option_c = Column(String(50), nullable=False)
     option_d = Column(String(50), nullable=False)
-    correct_option = Column(String(50), nullable=False)  # e.g., 'A', 'B', 'C', 'D'
+    correct_option = Column(String(50), nullable=False)
     modified_at = Column(DateTime, default=datetime.utcnow())
     created_at = Column(DateTime, default=datetime.utcnow())
 

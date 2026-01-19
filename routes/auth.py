@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 # files imports
 from models.models import User
 from databases.session import get_db
-from schemas.auth_schemas import UserRegister, UserEmail, PasswordUpdate, UserLogin
+from schemas.auth_schemas import UserRegister, UserLogout, PasswordUpdate, UserLogin
 from utils.responses import success_response, error_response
 from utils.security import create_access_token, create_refresh_token, security, SECRET_KEY, ALGORITHM
 from logs.logs import get_logger
@@ -111,7 +111,7 @@ async def login( request: Request, user_data: UserLogin, db: Session = Depends(g
 # ---------------- Logout ---------------------
 @auth_route.post("online-exams/users/logout/")
 @limiter.limit("5/minute")
-async def logout( request: Request,user_email: UserEmail, db: Session= Depends(get_db)):
+async def logout( request: Request,user_email: UserLogout, db: Session= Depends(get_db)):
     try:
         logout_user = db.query(User).filter(User.email == user_email.email).first()
         if not logout_user: 

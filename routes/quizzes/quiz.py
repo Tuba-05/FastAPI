@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.exc import SQLAlchemyError, OperationalError
 from sqlalchemy.orm import Session
 # files imports
-from models.models import Questions
+from models.models import Questions, User
 from databases.session import get_db
 from schemas.quizzes_schemas import TestTaken
 from utils.responses import success_response, error_response
@@ -24,6 +24,9 @@ quiz_route = APIRouter(prefix="/route", tags=["Route"])
 @limiter.limit("1000/minute")
 def quiz( request: Request, quiz_data: TestTaken, db: Session= Depends(get_db)):
     try:
+        is_user_valid =  db.query(User).filter(User.email== quiz_data.user_email).first()
+        if not is_user_valid:
+            return error_response("You are not registered yet.", status_code= 404)
         is_question_valid = db.query(Questions).filter(id== quiz_data.question_id).first()
         if not is_question_valid:
             raise HTTPException(status_code= 404, detail= "Question does not exist.")
