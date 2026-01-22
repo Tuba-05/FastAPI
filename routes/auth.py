@@ -8,9 +8,11 @@ from sqlalchemy.orm import Session
 # files imports
 from models.models import User
 from databases.session import get_db
-from schemas.auth_schemas import UserRegister, UserLogout, PasswordUpdate, UserLogin
+from schemas.auth_schemas import UserRegister, UserLogout, PasswordUpdate, UserLogin, VerifyOtp
 from utils.responses import success_response, error_response
 from utils.security import create_access_token, create_refresh_token, security, SECRET_KEY, ALGORITHM
+from utils.send_email import send_mail
+from utils.otp import generate_totp, generate_secret, verify_totp
 from logs.logs import get_logger
 # other imports
 from pwdlib import PasswordHash
@@ -38,14 +40,16 @@ def register( request: Request, user_data: UserRegister, db: Session = Depends(g
     try: # saving user
         if db.query(User).filter(User.email== user_data.email).first():
             return error_response(message= "User already registered ", status_code=409 )
-        
+        otp = generate_secret()
         registered_user = User(name = user_data.name, admin_secret_key= user_data.admin_secret_key,
-                               email = user_data.email, password = password_hash.hash(user_data.password) )
-        print(user_data.name, user_data.email, user_data.password, user_data.admin_secret_key)
+                               email = user_data.email, password = password_hash.hash(user_data.password),
+                                secrect_key= otp )
+        print(user_data.name, user_data.email, user_data.password, user_data.admin_secret_key,)
         db.add(registered_user)
         db.commit()
         logger.info("User registered successfully")
-        return success_response(message="User registered successfully", data={"email": registered_user.email}, status_code=201)
+        return success_response(message="User registered successfully", data={"email": registered_user.email}, 
+                                status_code=201)
 
     except OperationalError:
         # Database unavailable
@@ -137,6 +141,38 @@ async def logout( request: Request,user_email: UserLogout, db: Session= Depends(
         return error_response("Internal server error")
     
 
+# ---------------- Generate Otp ---------------------    
+@auth_route.post("onine/exams/users/otp")
+@limiter.limit("1/minute")
+async def get_otp(request: Request, user_data: UserLogout, db: Session = Depends(get_db)):
+    """ generate otp send to provoded user email """
+    try:
+        is_email_valid = db.query(User).filter(User.email == user_data.email).first()
+        if not is_email_valid:
+            return error_response(message="Invalid email", status_code= 401 )
+        otp = generate_totp(secret= is_email_valid.secret_key)
+        mail_accquired = send_mail(otp, is_email_valid)
+        if mail_accquired:
+            logger.info("✅ Email sent successfully!")
+            return success_response("Otp has been generated and sent to your email.", status_code=201)
+        return error_response("Something went wrong", status_code=404)
+    
+    except OperationalError:
+    # Database unavailable
+        logger.critical("Database unavailable (OperationalError)", exc_info=True)
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    except SQLAlchemyError:
+        # General database error
+        logger.error("Database error (SQLAlchemyError)", exc_info=True)
+        raise HTTPException(status_code=500, detail="Database error")
+
+    except Exception as e:
+        # Unexpected errors
+        logger.exception("Unhandled server exception")
+        return error_response("Internal server error")
+
+
 # ---------------- Update Password ---------------------    
 @auth_route.post("online-exams/users/password")
 @limiter.limit("5/minute")
@@ -144,15 +180,17 @@ async def update_password(request: Request, user_data: PasswordUpdate, db: Sessi
     """ Updates a user's password.
         Rate-limited to prevent brute-force attacks. """
     try:
-        is_email_valid = db.query(User).filter(User.email == user_data.email).first()
-        if not is_email_valid:
+        user_valid = db.query(User).filter(User.email == user_data.email).first()
+        if not user_valid:
             return error_response(message="Invalid email", status_code= 401 )
-        
-        is_email_valid.password =  password_hash.hash(user_data.new_password)
-        db.commit()
-        db.refresh(is_email_valid)
-        logger.info("User password updated successfully")
-        return success_response(message="Password updated!", data={"email": user_data.email}, status_code=200)
+    
+        valid_otp = verify_totp(user_input= user_data.otp, secret= user_valid.secret_key)
+        if valid_otp: 
+            user_valid.password =  password_hash.hash(user_data.new_password)
+            db.commit()
+            db.refresh(user_valid)
+            logger.info("User password updated successfully")
+            return success_response(message="Password updated!", data={"email": user_data.email}, status_code=200)
            
     except OperationalError:
         # Database unavailable

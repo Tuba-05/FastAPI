@@ -16,5 +16,5 @@ class AddQuestions(BaseModel):
 class TestTaken(BaseModel):
     user_email : EmailStr
     question_id : int
-    answer : str
+    answer : str 
     

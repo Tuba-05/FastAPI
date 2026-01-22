@@ -36,7 +36,7 @@ def add_question( request: Request,questions_data: AddQuestions, db: Session= De
                                 option_d= questions_data.option_D, correct_option= questions_data.correct_one)
         db.add(quetsions_added)
         db.commit()
-        logger.info("Questions added to DB.")
+        logger.info("Admin added questions to DB.")
         return success_response("Questions successfully added to quiz", data={"question_id": quetsions_added.id}, status_code=201)
         
     except OperationalError:

@@ -26,10 +26,16 @@ def quiz( request: Request, quiz_data: TestTaken, db: Session= Depends(get_db)):
     try:
         is_user_valid =  db.query(User).filter(User.email== quiz_data.user_email).first()
         if not is_user_valid:
+            logger.info("User is not registered.")
             return error_response("You are not registered yet.", status_code= 404)
-        is_question_valid = db.query(Questions).filter(id== quiz_data.question_id).first()
+        
+        is_question_valid = db.query(Questions).filter(Questions.id== quiz_data.question_id, 
+                                                       Questions.correct_option == quiz_data.answer).first()
         if not is_question_valid:
-            raise HTTPException(status_code= 404, detail= "Question does not exist.")
+            logger.info("User answers the wrong answer")
+            return success_response("Wrong Answer.", status_code= 422)
+        logger.info("User answers the correct answer")
+        return success_response("Correct Answer.", status_code=201)
         
     except OperationalError:
         # Database unavailable

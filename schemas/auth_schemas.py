@@ -21,5 +21,8 @@ class UserLogout(BaseModel):
 class PasswordUpdate(BaseModel):
     email: EmailStr
     new_password: str = Field(max_length=7)
+    otp = str
 
-
+class VerifyOtp(BaseModel):
+    user_email : EmailStr
+    otp = str   

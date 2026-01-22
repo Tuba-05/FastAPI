@@ -10,6 +10,7 @@ class User(model):
     name = Column(String(100), nullable=False)
     email = Column(String(20), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
+    secret_key = Column(String(50), nullable= True)
     modified_at = Column(DateTime, default=datetime.utcnow()) # utc, global time zone
     created_at = Column(DateTime, default=datetime.utcnow())
 
