@@ -26,12 +26,12 @@ logger = get_logger(__name__)
 # Limiter instance to apply rate limiting based on client IP address
 limiter = Limiter(key_func=get_remote_address)
 
-auth_route = APIRouter(prefix="/route", tags=["Route"]) # for authentication-related endpoints
+auth_route = APIRouter(prefix="/online-exams", tags=["Route"]) # for authentication-related endpoints
 
 password_hash = PasswordHash.recommended() # creating a password hashing object 
 
 # ---------------- Registeration ---------------------
-@auth_route.post("online-exams/users/register/" )
+@auth_route.post("/users/register/" )
 @limiter.limit("5/minute")
 def register( request: Request, user_data: UserRegister, db: Session = Depends(get_db) ):
     """ Registers a new user.
@@ -67,7 +67,7 @@ def register( request: Request, user_data: UserRegister, db: Session = Depends(g
 
 
 # ---------------- Login ---------------------
-@auth_route.post("online-exams/users/login/")
+@auth_route.post("/users/login/")
 @limiter.limit("5/minute")  # Limit login attempts to 5 requests per minute per IP
 async def login( request: Request, user_data: UserLogin, db: Session = Depends(get_db)):
     """ Authenticates a user and returns a JWT access token.
@@ -91,6 +91,7 @@ async def login( request: Request, user_data: UserLogin, db: Session = Depends(g
 
         logger.info("User logged in successfully")
         return success_response("Suceesfully logged in.", data= {"email": login_user.email, 
+                                                                 "username": login_user.name,
                                                                 "access_token": access_token,
                                                                 "refresh_token": refresh_token, 
                                                                 "token_type": "bearer"}, 
@@ -112,7 +113,7 @@ async def login( request: Request, user_data: UserLogin, db: Session = Depends(g
 
 
 # ---------------- Logout ---------------------
-@auth_route.post("online-exams/users/logout/")
+@auth_route.post("/users/logout/")
 @limiter.limit("5/minute")
 async def logout( request: Request,user_email: UserEmail, db: Session= Depends(get_db)):
     try:
@@ -141,7 +142,7 @@ async def logout( request: Request,user_email: UserEmail, db: Session= Depends(g
     
 
 # ---------------- Generate Otp ---------------------    
-@auth_route.post("onine/exams/users/otp")
+@auth_route.post("/users/otp")
 @limiter.limit("7/minute")
 async def get_otp(request: Request, user_data: UserEmail, db: Session = Depends(get_db)):
     """ generate otp send to provoded user email """
@@ -173,7 +174,7 @@ async def get_otp(request: Request, user_data: UserEmail, db: Session = Depends(
 
 
 # ---------------- Update Password ---------------------    
-@auth_route.post("online-exams/users/password")
+@auth_route.post("/users/password")
 @limiter.limit("5/minute")
 async def update_password(request: Request, user_data: PasswordUpdate, db: Session= Depends(get_db)):
     """ Updates a user's password.
@@ -209,7 +210,7 @@ async def update_password(request: Request, user_data: PasswordUpdate, db: Sessi
 
 
 # ---------------- Refresh Access Token ---------------------
-@auth_route.post("/online-exams/users/refresh")
+@auth_route.post("/users/refresh")
 @limiter.limit("5/minute")
 async def refresh_access_token( request: Request, credentials: HTTPAuthorizationCredentials = Depends(security)):
     """ Refreshes the access token using a valid refresh token.

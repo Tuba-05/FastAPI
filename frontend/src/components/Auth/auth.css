@@ -1,0 +1,325 @@
+/* Import Boxicons for social media icons */
+@import url('https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css');
+
+*{
+  font-family: 'Montserrat';
+}
+/* ==========================================
+   BASE STYLES & BACKGROUND
+   ========================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  
+  /* Beautiful gradient background */
+  background: linear-gradient(135deg, 
+  rgb(19, 18, 18) 5%,   /* black */
+  rgb(102, 255, 222) 50%,  /* Parrot light */
+  rgb(76, 235, 169) 60%,  /* Light cyan */
+  rgb(38, 229, 229) 70%,   /* Sky blue */
+  rgb(189, 189, 189) 100%  /* Light grey */
+);
+  
+  /* Alternative: Use background image */
+  /* 
+  background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  */
+}
+
+.background-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(3px);
+  background: rgba(255, 255, 255, 0);
+  z-index: 1;
+}
+/* ==========================================
+   GLASS CARD CONTAINER
+   ========================================== */
+/* jo SignUp/In form show horaha hai uski fixing*/
+
+.auth-container {
+  position: relative; /*will move without effecting other elements*/
+  z-index: 2;
+  width: 100%;
+  max-width: 450px;
+  padding: 20px;
+}
+/* jo form/container hame show horaha hai uske andar ki styling*/
+.glass-card {
+  /* Glassmorphism effect */
+  background: hsla(285, 100%, 92%, 0.501);
+  backdrop-filter: blur(20px);
+  border: 3px solid rgb(173, 29, 189);
+  border-radius: 20px;
+  -webkit-backdrop-filter: blur(20px); /* Safari support */
+  /* Box shadow for depth */
+  box-shadow: 
+    0 20px 40px rgb(32, 30, 30),
+    0 15px 25px rgb(0, 0, 0),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  
+  padding: 40px 35px;
+  position: relative; /*will move without effecting other elements*/
+  overflow: hidden;
+  
+  /* Animation (jab switch krenge login se )*/
+  animation: slideUp 0.8s ease-out;
+}
+
+/* Subtle animated border */
+.glass-card::before {
+  content: '';
+  position: absolute; /*will positioned to nearest ancestor elements(relative|absolute|fixed|sticky)*/
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 20px;
+  padding: 1px;
+  background: linear-gradient(45deg, 
+    rgba(255, 255, 255, 0.3), 
+    rgba(255, 255, 255, 0.1), 
+    rgba(255, 255, 255, 0.3)
+  );
+  mask: linear-gradient(#ffffff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  z-index: -1;
+}
+
+/* ==========================================
+   HEADER SECTION
+   ========================================== */
+
+.card-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.auth-title {
+  font-size: 29px;
+  font-weight: 700;
+  color: #101010d7;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 4px rgba(22, 17, 17, 0.867);
+}
+
+.auth-subtitle {
+  font-size: 15px;
+  color: rgba(18, 18, 18, 0.964);
+  text-shadow: 0 2px 4px rgba(22, 17, 17, 0.867);
+  line-height: 1.4; /* gap b/w title & subtitle*/
+}
+
+/* ==========================================
+   FORM STYLES
+   ========================================== */
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* input portions for LoginSignUp */
+
+.input-group {
+  text-shadow: 0 2px 4px rgba(148, 137, 137, 0.867);
+  color: rgba(18, 18, 18, 0.964);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(18, 18, 18, 0.964);
+  margin-left: 5px;
+}
+
+.glass-input {
+  padding: 15px 18px;
+  border: 2px solid rgb(171, 55, 229);
+  border-radius: 19px;
+  
+  /* Glass input effect */
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  font-weight: 500;
+  color: #050505;
+  font-size: 16px;
+  outline: none;
+  transition: all 0.3s ease;
+  
+  /* Placeholder(text area) styling */
+  &::placeholder {
+    color: rgba(27, 25, 25, 0.853);
+  }
+}
+
+.glass-input:focus {
+  border-color: rgba(179, 3, 255, 0.959);
+  background: rgba(190, 21, 21, 0.081);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0);
+  transform: translateY(-1px);
+}
+
+/* ==========================================
+   FORGOT PASSWORD LINK
+   ========================================== */
+
+.forgot-password {
+  text-align: right;
+  margin-top: -10px;
+}
+
+.forgot-link {
+  font-size: 14px;
+  color: rgba(18, 18, 18, 0.964);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.forgot-link:hover {
+  color: rgba(18, 18, 18, 0.964);
+  text-decoration: underline;
+}
+
+/* ==========================================
+   BUTTONS
+   ========================================== */
+
+.glass-button {
+  padding: 13px 24px;
+  border: none;
+  border-radius: 12px;
+  font-size: 19px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
+  outline: none;
+}
+
+/* Primary button */
+.glass-button.primary {
+  margin-top: 3px; 
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  color: rgba(18, 18, 18, 0.964);
+  border: 2px solid rgb(176, 18, 200);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.glass-button.primary:hover {
+  background: rgba(255, 255, 255, 0);
+  transform: translateY(-2px); /*box moves slightly upward when cursor places*/
+  box-shadow: 0 12px 24px rgba(103, 92, 92, 0.726);
+}
+
+.glass-button.primary:active {
+  transform: translateY(0);
+}
+
+/* ==========================================
+   AUTH SWITCH (Login/Signup toggle)
+   ========================================== */
+
+.auth-switch {
+  text-align: center;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.auth-switch p {
+  color: rgba(18, 18, 18, 0.964);
+  font-size: 14px;
+}
+
+.switch-button {
+  background: none;
+  border: none;
+  color: rgba(18, 18, 18, 0.964);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 14px;
+  transition: opacity 0.3s ease;
+}
+
+.switch-button:hover {
+  opacity: 0.8;
+}
+
+/* ==========================================
+   ANIMATIONS
+   ========================================== */
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN
+   ========================================== */
+
+@media (max-width: 480px) {
+  .auth-container {
+    max-width: 100%;
+    padding: 15px;
+  }
+  
+  .glass-card {
+    padding: 30px 25px;
+    border-radius: 15px;
+  }
+  
+  .name-row {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .auth-title {
+    font-size: 24px;
+  }
+  
+  .glass-input {
+    padding: 12px 15px;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  .glass-button {
+    padding: 12px 20px;
+  }
+}
