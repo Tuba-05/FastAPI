@@ -1,7 +1,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Auth from './components/Auth/auth.jsx'
-import ExamRoom from './components/exam_room/exam_room.jsx'
-import TeacherRoom from './components/teacher_room/teacher_room.jsx'
+import Auth from './components/Auth/auth.jsx';
+import ExamRoom from './components/exam_room/exam_room.jsx';
+import TeacherRoom from './components/teacher_room/teacher_room.jsx';
+import VeriCode from './components/VeriCode/VeriCode.jsx';
+
 function App() {
 
   return (
@@ -10,6 +12,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Auth/>} ></Route>
         <Route path="Exam-Room" element={<ExamRoom />}></Route>
+        <Route path="/VeriCode" element={<VeriCode/>}></Route>
       </Routes>
     </BrowserRouter>  
     </>

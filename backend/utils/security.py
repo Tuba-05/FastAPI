@@ -2,6 +2,9 @@ import jwt
 from datetime import datetime, timedelta
 from fastapi import HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from sqlalchemy.orm import Session
+
+from models.models import User
 import os
 from dotenv import load_dotenv
 
@@ -75,3 +78,10 @@ def verify_jwt_token( credentials: HTTPAuthorizationCredentials = Depends(securi
     except jwt.InvalidTokenError:
         # Token is malformed or signature is invalid
         raise HTTPException(status_code=401, detail="Invalid token")
+
+
+def get_user_from_token(token: str, db: Session):
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    user_id = payload.get("sub")
+
+    return db.query(User).filter(User.id == user_id).first()

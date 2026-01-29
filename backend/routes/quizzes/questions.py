@@ -19,9 +19,9 @@ logger = get_logger(__name__)
 # Limiter instance to apply rate limiting based on client IP address
 limiter = Limiter(key_func=get_remote_address)
 
-questions_route = APIRouter(prefix="/route", tags=["Route"])
+questions_route = APIRouter(prefix="/online-exams", tags=["Route"])
 
-@questions_route.post("online-exams/add-questions/")
+@questions_route.post("/add-questions/")
 @limiter.limit("100/minute")
 def add_question( request: Request,questions_data: AddQuestions, db: Session= Depends(get_db)):
     """ takes quiz questions data from admin.

@@ -10,7 +10,7 @@ from models.models import User
 from databases.session import get_db
 from schemas.auth_schemas import UserRegister, UserEmail, PasswordUpdate, UserLogin, VerifyOtp
 from utils.responses import success_response, error_response
-from utils.security import create_access_token, create_refresh_token, security, SECRET_KEY, ALGORITHM
+from utils.security import verify_jwt_token, create_access_token, create_refresh_token, security, SECRET_KEY, ALGORITHM
 from utils.send_email import send_mail
 from utils.otp import generate_totp, generate_secret, verify_totp
 from logs.logs import get_logger
@@ -92,9 +92,7 @@ async def login( request: Request, user_data: UserLogin, db: Session = Depends(g
         logger.info("User logged in successfully")
         return success_response("Suceesfully logged in.", data= {"email": login_user.email, 
                                                                  "username": login_user.name,
-                                                                "access_token": access_token,
-                                                                "refresh_token": refresh_token, 
-                                                                "token_type": "bearer"}, 
+                                                                "access_token": access_token,}, 
                                                         status_code=200)
     except OperationalError:
         # Database unavailable
@@ -243,5 +241,11 @@ async def refresh_access_token( request: Request, credentials: HTTPAuthorization
     # If token is fake, tampered, or malformed
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid refresh token")
+
+
+@auth_route("/profile")
+def get_profile(payload=Depends(verify_jwt_token)):
+    user_id = payload["sub"]
+    return {"user_id": user_id}
 
 

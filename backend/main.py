@@ -19,13 +19,16 @@ logger.info("Application startup")
 
 app = FastAPI() # app
 
-origins = [ "http://localhost:5173", ]
+origins = [ "http://localhost:5173", 
+           "http://127.0.0.1:5173",
+           ]
+# allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins="http://localhost:5173",
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all standard methods (GET, POST, etc.)
+    allow_methods= ["*"],  # Allows all standard methods (GET, POST, etc.)
     allow_headers=["*"],  # Allows all headers
 )
 
@@ -35,6 +38,16 @@ app.include_router(auth.auth_route)
 app.include_router(quizzes.quiz_route)
 app.include_router(question.questions_route)
 
+print("\n===== REGISTERED ROUTES =====")
+for r in app.routes:
+    print(r.path)
+print("============================\n")
+
+
+
+# @app.options("/{path:path}")
+# async def options_catch_all():
+#     return {}
 
 # --------------- web socktes ---------------
 @app.websocket("/ws/exam/{exam_id}")

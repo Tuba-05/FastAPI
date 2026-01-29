@@ -68,7 +68,7 @@ const auth = () => {
     else {
       // signup
       if (formData.username && formData.email && formData.password) {
-        const response = await fetch("http://127.0.0.1:8000/online-exams/users/register/", // connection for signup function of flask bkend
+        const response = await fetch("http://127.0.0.1:8000/online-exams/users/register", // connection for signup function of flask bkend
           {
           method: "POST", //sends data in the request body, which is hidden from the URL, making it more secure.
           headers: { "Content-Type": "application/json" },
@@ -81,13 +81,13 @@ const auth = () => {
         });
         const data = await response.json();
         if (data.success) {
-          // save user info in localStorage for session persistence later used in watchlist page
-          localStorage.setItem("userEmail", data.user.email); // user email 
-          alert(data.message); // signup sucessful
+          
+          alert(data?.message); // signup sucessful
+          isLogin(true);
           navigate("/"); // navigate to HmPg
         } 
         else {
-          alert(data.message); // signup sucessful
+          alert(data.message); // signup fail
         }
       } 
       else {
