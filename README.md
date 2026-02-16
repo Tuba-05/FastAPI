@@ -15,7 +15,7 @@ The system is being developed using **FastAPI** for the backend and **React.js**
 ### Backend
 - **FastAPI** (Python 3.12)
 - **Uvicorn** (ASGI Server)
-- **PostgreSQL / MySQL** (via SQLAlchemy)
+- **MySQL** (via SQLAlchemy)
 - **JWT Authentication**
 - **WebSockets** (for real-time exam rooms)
 - **Pydantic** (data validation)
