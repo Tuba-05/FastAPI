@@ -1,4 +1,5 @@
 # app/router/auth.py
+import datetime
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials
 
@@ -84,9 +85,12 @@ async def login( request: Request, user_data: UserLogin, db: Session = Depends(g
         if not login_user or not password_hash.verify(user_data.password, login_user.password):
             return error_response( message="Invalid email or password", status_code=401,)
         
+        login_user.modified_at = datetime.utcnow() # update last login time
+        db.commit() # save changes to database
+
         # Create JWT token containing user identity data
-        access_token = create_access_token({ "user_id": login_user.id, "email": login_user.email })
-        
+        access_token = create_access_token(data={"sub": str(login_user.id)})
+
         refresh_token = create_refresh_token({ "user_id": login_user.id })
 
         logger.info("User logged in successfully")
@@ -118,8 +122,9 @@ async def logout( request: Request,user_email: UserEmail, db: Session= Depends(g
         logout_user = db.query(User).filter(User.email == user_email.email).first()
         if not logout_user: 
             return error_response(message= "User not found", status_code= 404)
-        # db.delete(logout_user)
-        # db.commit()
+        
+        logout_user.modified_at = datetime.utcnow() # update last login time
+        db.commit() # save changes to database
         logger.info("User logged out successfully")
         return success_response("Logged out successfully", data={"email": logout_user.email}, status_code=200)
     
@@ -149,7 +154,7 @@ async def get_otp(request: Request, user_data: UserEmail, db: Session = Depends(
         if not is_email_valid:
             return error_response(message="Invalid email", status_code= 401 )
         otp = generate_totp(secret= is_email_valid.otp_secret)
-        mail_accquired = send_mail(otp, "demotbsx@gmail.com")
+        mail_accquired = send_mail(otp, is_email_valid.email)
         if mail_accquired:
             logger.info("✅ Email sent successfully!")
             return success_response("Otp has been generated and sent to your email.", status_code=201)
@@ -172,7 +177,7 @@ async def get_otp(request: Request, user_data: UserEmail, db: Session = Depends(
 
 
 # ---------------- Update Password ---------------------    
-@auth_route.post("/users/password")
+@auth_route.post("/users/update-password")
 @limiter.limit("5/minute")
 async def update_password(request: Request, user_data: PasswordUpdate, db: Session= Depends(get_db)):
     """ Updates a user's password.
@@ -243,8 +248,9 @@ async def refresh_access_token( request: Request, credentials: HTTPAuthorization
         raise HTTPException(status_code=401, detail="Invalid refresh token")
 
 
-@auth_route("/profile")
+@auth_route.post("users/profile")
 def get_profile(payload=Depends(verify_jwt_token)):
+    """ Protected route to get user profile data from JWT token payload. """
     user_id = payload["sub"]
     return {"user_id": user_id}
 

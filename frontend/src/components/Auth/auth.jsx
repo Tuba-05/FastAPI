@@ -52,9 +52,9 @@ const auth = () => {
         const data = await response.json();
         if (data.success) {
           // save user info in localStorage for session persistence later used in watchlist page
-          localStorage.setItem("username", data.username)
-          localStorage.setItem("userEmail", data.email); // user email 
-          localStorage.setItem("access_token", data.access_token)
+          localStorage.setItem("username", data.data.username)
+          localStorage.setItem("userEmail", data.data.email); // user email 
+          localStorage.setItem("access_token", data.data.access_token)
           alert(data.message); // login sucessful
           navigate("/Exam-Room"); // navigate to HmPg
         } else {
@@ -83,8 +83,9 @@ const auth = () => {
         if (data.success) {
           
           alert(data?.message); // signup sucessful
-          isLogin(true);
-          navigate("/"); // navigate to HmPg
+          setIsLogin(true); 
+          // Optional: Clear the password field for security before switching
+          setFormData({ ...formData, password: "", admin_secret_key: "" });
         } 
         else {
           alert(data.message); // signup fail
@@ -119,7 +120,6 @@ const auth = () => {
   const trigger_verif_code = () =>{
     if (formData.email){
       localStorage.setItem("userEmail", formData.email)
-      alert("Verification code has sent to your email");
       navigate("/VeriCode"); // navigate to code verification pg
     }
     else{

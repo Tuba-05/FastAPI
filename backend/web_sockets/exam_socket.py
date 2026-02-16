@@ -11,7 +11,13 @@ connected_users = {}  # ws -> username
 
 async def exam_room_socket(ws: WebSocket, exam_id: int, db: Session = Depends(get_db)):
     token = ws.query_params.get("token")
+    if not token or token.count(".") != 2:
+        await ws.close(code=1008)
+        return
     user = get_user_from_token(token, db)
+    if not user:
+        await ws.close(code=1008)
+        return
 
     username = user.name
 
@@ -28,7 +34,7 @@ async def exam_room_socket(ws: WebSocket, exam_id: int, db: Session = Depends(ge
      # JOIN EVENT
     await broadcast_message(room, {
         "type": "event",
-        "message": f"{username}t joined the exam"
+        "message": f"{username} joined the exam"
     })
 
     # Send updated/live count when someone joins
@@ -43,13 +49,15 @@ async def exam_room_socket(ws: WebSocket, exam_id: int, db: Session = Depends(ge
                 # you could save submission to DB here
                 await broadcast_message(room, {
                     "type": "submission",
+                    "username" : username,
                     "message": f"{username} submitted the exam"
                 })
 
     # when user closes the page from frontend
     except WebSocketDisconnect:
-        exam_rooms[room].remove(ws)
-        connected_users.pop(ws, None)
+        if room in exam_rooms and ws in exam_rooms[room]:
+            exam_rooms[room].remove(ws)
+            connected_users.pop(ws, None)
 
         # LEAVE EVENT
         await broadcast_message(room, {

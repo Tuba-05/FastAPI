@@ -15,6 +15,8 @@ class User(model):
     created_at = Column(DateTime, default=datetime.utcnow())
 
 
+
+# UI and business logic not implemented yet, but can be used to store quiz questions and results in the future
 class Questions(model):
     __tablename__ = "questions"
     id = Column(Integer, primary_key=True, index=True)

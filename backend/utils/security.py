@@ -80,8 +80,12 @@ def verify_jwt_token( credentials: HTTPAuthorizationCredentials = Depends(securi
         raise HTTPException(status_code=401, detail="Invalid token")
 
 
+# -------------------- Getting User From JWT Token --------------------
 def get_user_from_token(token: str, db: Session):
     payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    user_id = payload.get("sub")
 
-    return db.query(User).filter(User.id == user_id).first()
+    user_id = payload.get("sub")
+    if not user_id:
+        return None
+
+    return db.query(User).filter(User.id == int(user_id)).first()

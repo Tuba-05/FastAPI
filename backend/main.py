@@ -1,9 +1,12 @@
-from fastapi import FastAPI, Request, WebSocket
+from fastapi import FastAPI, Request, WebSocket, Depends
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-
+# sqlalchemy imports
+from sqlalchemy.exc import SQLAlchemyError, OperationalError
+from sqlalchemy.orm import Session
 #  files import
+from databases.session import get_db
 import routes.auth as auth
 import routes.quizzes.quiz as quizzes
 import routes.quizzes.questions as question
@@ -51,20 +54,16 @@ print("============================\n")
 
 # --------------- web socktes ---------------
 @app.websocket("/ws/exam/{exam_id}")
-async def websocket_endpoint(ws: WebSocket, exam_id: int):
-    await exam_room_socket(ws, exam_id)
+async def websocket_endpoint(ws: WebSocket, exam_id: int, db: Session = Depends(get_db) ):
+    await exam_room_socket(ws, exam_id, db)
 
 # -------------- Route for invalid data format ------------
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    return JSONResponse(
-        status_code=400,
-        content={
-            "success": False,
-            "message": "Email or password is invalid",
-            "data": None
-        }
-    )
+    return JSONResponse(status_code=400, content={ "success": False,
+                                                    "message": "Email or password is invalid",
+                                                    "data": None } )
+
 
 @app.get("/")
 def root():
