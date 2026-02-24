@@ -1,11 +1,11 @@
 from fastapi import FastAPI, Request, WebSocket, Depends
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 # sqlalchemy imports
-from sqlalchemy.exc import SQLAlchemyError, OperationalError
 from sqlalchemy.orm import Session
 #  files import
+from utils.responses import success_response, error_response
+from backend.utils.exceptions import add_exception_handlers
 from databases.session import get_db
 import routes.auth as auth
 import routes.quizzes.quiz as quizzes
@@ -21,6 +21,7 @@ logger = get_logger(__name__)
 logger.info("Application startup") 
 
 app = FastAPI() # app
+add_exception_handlers(app)
 
 origins = [ "http://localhost:5173", 
            "http://127.0.0.1:5173",
@@ -60,9 +61,7 @@ async def websocket_endpoint(ws: WebSocket, exam_id: int, db: Session = Depends(
 # -------------- Route for invalid data format ------------
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    return JSONResponse(status_code=400, content={ "success": False,
-                                                    "message": "Email or password is invalid",
-                                                    "data": None } )
+    return error_response(message="Email or password is invalid", status_code=400)
 
 
 @app.get("/")

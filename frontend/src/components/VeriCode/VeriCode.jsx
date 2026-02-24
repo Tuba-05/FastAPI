@@ -26,7 +26,7 @@ const VeriCode = () => {
     const generate_code = useCallback(() => {
         if (timeLeft > 0) return; // Prevent spamming if timer is active
 
-        fetch('http://127.0.0.1:8000/online-exams/users/otps', {
+        fetch(`http://127.0.0.1:8000/online-exams/users/otps`, {
             method: 'POST',
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: userEmail })

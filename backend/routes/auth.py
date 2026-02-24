@@ -4,9 +4,10 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials
 
 # sqlalchemy imports
-from sqlalchemy.exc import SQLAlchemyError, OperationalError
 from sqlalchemy.orm import Session
 # files imports
+from backend.crud import crud
+from crud.crud import login_user, register_user, update_password, logout_user
 from models.models import User
 from databases.session import get_db
 from schemas.auth_schemas import UserRegister, UserEmail, PasswordUpdate, UserLogin, VerifyOtp
@@ -38,34 +39,14 @@ def register( request: Request, user_data: UserRegister, db: Session = Depends(g
     """ Registers a new user.
         Hashes password before saving.
         Rate limited to 5 requests per minute per IP. """
-    try: # saving user
-        if db.query(User).filter(User.email== user_data.email).first():
-            return error_response(message= "User already registered ", status_code=409 )
-        otp = generate_secret()
-        registered_user = User(name = user_data.name, admin_secret_key= user_data.admin_secret_key,
-                               email = user_data.email, password = password_hash.hash(user_data.password),
-                                otp_secret= otp )
-        db.add(registered_user)
-        db.commit()
-        logger.info("User registered successfully")
-        return success_response(message="User registered successfully", data={"email": registered_user.email}, 
+    # saving user
+    register_user = register_user(db, user_data)
+    if not register_user:
+        return error_response(message="User with this email already exists.", status_code=409)
+
+    logger.info("User registered successfully")
+    return success_response(message="User registered successfully", data={"email": register_user.new_user.email}, 
                                 status_code=201)
-
-    except OperationalError:
-        # Database unavailable
-        logger.critical("Database unavailable (OperationalError)", exc_info=True)
-        raise HTTPException(status_code=503, detail="Database unavailable")
-
-    except SQLAlchemyError:
-        # General database error
-        logger.error("Database error (SQLAlchemyError)", exc_info=True)
-        raise HTTPException(status_code=500, detail="Database error")
-
-    except Exception:
-        # Unexpected errors
-        logger.exception("Unhandled server exception")
-        return error_response("Internal server error")
-
 
 # ---------------- Login ---------------------
 @auth_route.post("/users/login/")
@@ -76,72 +57,35 @@ async def login( request: Request, user_data: UserLogin, db: Session = Depends(g
         1. Fetch user by email
         2. Verify password using pwblib
         3. Generate and return JWT token """
-    try:
-        login_user = db.query(User).filter(User.email == user_data.email).first()
-        # if not login_user:
-        #     return error_response(message= "User not found", status_code= 404)
+    
+    login_user = login_user(db, user_data.email, user_data.password)
         
-        # Verify password using pwblib
-        if not login_user or not password_hash.verify(user_data.password, login_user.password):
-            return error_response( message="Invalid email or password", status_code=401,)
+    if not login_user:
+        return error_response( message="Invalid email or password", status_code=401,)
         
-        login_user.modified_at = datetime.utcnow() # update last login time
-        db.commit() # save changes to database
+    # Create JWT token containing user identity data
+    access_token = create_access_token(data={"sub": str(login_user.user.id)})
 
-        # Create JWT token containing user identity data
-        access_token = create_access_token(data={"sub": str(login_user.id)})
+    refresh_token = create_refresh_token({ "user_id": login_user.user.id })
 
-        refresh_token = create_refresh_token({ "user_id": login_user.id })
-
-        logger.info("User logged in successfully")
-        return success_response("Suceesfully logged in.", data= {"email": login_user.email, 
-                                                                 "username": login_user.name,
+    logger.info("User logged in successfully")
+    return success_response("Suceesfully logged in.", data= {"email": login_user.user.email, 
+                                                                 "username": login_user.user.name,
                                                                 "access_token": access_token,}, 
                                                         status_code=200)
-    except OperationalError:
-        # Database unavailable
-        logger.critical("Database unavailable (OperationalError)", exc_info=True)
-        raise HTTPException(status_code=503, detail="Database unavailable")
-
-    except SQLAlchemyError:
-        # General database error
-        logger.error("Database error (SQLAlchemyError)", exc_info=True)
-        raise HTTPException(status_code=500, detail="Database error")
-
-    except Exception as e:
-        # Unexpected errors
-        logger.exception("Unhandled server exception")
-        return error_response("Internal server error")
 
 
 # ---------------- Logout ---------------------
 @auth_route.post("/users/logout/")
 @limiter.limit("5/minute")
 async def logout( request: Request,user_email: UserEmail, db: Session= Depends(get_db)):
-    try:
-        logout_user = db.query(User).filter(User.email == user_email.email).first()
-        if not logout_user: 
-            return error_response(message= "User not found", status_code= 404)
         
-        logout_user.modified_at = datetime.utcnow() # update last login time
-        db.commit() # save changes to database
-        logger.info("User logged out successfully")
-        return success_response("Logged out successfully", data={"email": logout_user.email}, status_code=200)
+    logout_user = logout_user(db, user_email.email)
+    if not logout_user: 
+        return error_response(message= "User not found", status_code= 404)
     
-    except OperationalError:
-        # Database unavailable
-        logger.critical("Database unavailable (OperationalError)", exc_info=True)
-        raise HTTPException(status_code=503, detail="Database unavailable")
-
-    except SQLAlchemyError:
-        # General database error
-        logger.error("Database error (SQLAlchemyError)", exc_info=True)
-        raise HTTPException(status_code=500, detail="Database error")
-
-    except Exception as e:
-        # Unexpected errors
-        logger.exception("Unhandled server exception")
-        return error_response("Internal server error")
+    logger.info("User logged out successfully")
+    return success_response("Logged out successfully", data={"email": logout_user.user.email}, status_code=200)
     
 
 # ---------------- Generate Otp ---------------------    
@@ -149,31 +93,17 @@ async def logout( request: Request,user_email: UserEmail, db: Session= Depends(g
 @limiter.limit("7/minute")
 async def get_otp(request: Request, user_data: UserEmail, db: Session = Depends(get_db)):
     """ generate otp send to provoded user email """
-    try:
-        is_email_valid = db.query(User).filter(User.email == user_data.email).first()
-        if not is_email_valid:
-            return error_response(message="Invalid email", status_code= 401 )
-        otp = generate_totp(secret= is_email_valid.otp_secret)
-        mail_accquired = send_mail(otp, is_email_valid.email)
-        if mail_accquired:
-            logger.info("✅ Email sent successfully!")
-            return success_response("Otp has been generated and sent to your email.", status_code=201)
-        return error_response("Something went wrong", status_code=404)
     
-    except OperationalError:
-    # Database unavailable
-        logger.critical("Database unavailable (OperationalError)", exc_info=True)
-        raise HTTPException(status_code=503, detail="Database unavailable")
-
-    except SQLAlchemyError:
-        # General database error
-        logger.error("Database error (SQLAlchemyError)", exc_info=True)
-        raise HTTPException(status_code=500, detail="Database error")
-
-    except Exception as e:
-        # Unexpected errors
-        logger.exception("Unhandled server exception")
-        return error_response("Internal server error")
+    is_email_valid = db.query(User).filter(User.email == user_data.email).first()
+    if not is_email_valid:
+        return error_response(message="Invalid email", status_code= 401 )
+    otp = generate_totp(secret= is_email_valid.otp_secret)
+    mail_accquired = send_mail(otp, is_email_valid.email)
+    if mail_accquired:
+        logger.info("✅ Email sent successfully!")
+        return success_response("Otp has been generated and sent to your email.", status_code=201)
+    return error_response("Something went wrong", status_code=404)
+    
 
 
 # ---------------- Update Password ---------------------    
@@ -182,36 +112,17 @@ async def get_otp(request: Request, user_data: UserEmail, db: Session = Depends(
 async def update_password(request: Request, user_data: PasswordUpdate, db: Session= Depends(get_db)):
     """ Updates a user's password.
         Rate-limited to prevent brute-force attacks. """
-    try:
-        user_valid = db.query(User).filter(User.email == user_data.email).first()
-        if not user_valid:
-            return error_response(message="Invalid email", status_code= 401 )
+
+    user_valid = update_password(db, user_data.email)
+    if not user_valid:
+        return error_response(message="Invalid email", status_code= 401 )
     
-        valid_otp = verify_totp(user_input= user_data.otp, secret= user_valid.otp_secret)
-        if valid_otp: 
-            user_valid.password =  password_hash.hash(user_data.new_password)
-            db.commit()
-            db.refresh(user_valid)
-            logger.info("User password updated successfully")
-            return success_response(message="Password updated!", data={"email": user_data.email}, status_code=200)
-        return error_response("Something went wrong", status_code=404)
+    if user_valid:
+        logger.info("User password updated successfully")
+        return success_response(message="Password updated!", data={"email": user_data.email}, status_code=200)
+    return error_response("Something went wrong", status_code=404)
        
-    except OperationalError:
-        # Database unavailable
-        logger.critical("Database unavailable (OperationalError)", exc_info=True)
-        raise HTTPException(status_code=503, detail="Database unavailable")
-
-    except SQLAlchemyError:
-        # General database error
-        logger.error("Database error (SQLAlchemyError)", exc_info=True)
-        raise HTTPException(status_code=500, detail="Database error")
-
-    except Exception as e:
-        # Unexpected errors
-        logger.exception("Unhandled server exception")
-        return error_response("Internal server error")
-
-
+ 
 # ---------------- Refresh Access Token ---------------------
 @auth_route.post("/users/refresh")
 @limiter.limit("5/minute")
