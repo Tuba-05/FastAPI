@@ -1,9 +1,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Auth from './components/Auth/auth.jsx';
-import ExamRoom from './components/exam_room/exam_room.jsx';
+import Auth from './components/auth/auth.jsx';
+import ExamRoom from './components/sockets/exam_room.jsx';
 import VeriCode from './components/VeriCode/VeriCode.jsx';
-import Classjoin from "./components/classjoin/classjoin.jsx";
-import Createclassroom from "./components/createclassroom/createclassroom.jsx";
+import Classjoin from "./components/classroom/classentry.jsx";
+import Createclassroom from "./components/classroom/createdclassroom.jsx";
 // import TeacherRoom from './components/teacher_room/teacher_room.jsx';
 
 function App() {

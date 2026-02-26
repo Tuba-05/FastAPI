@@ -126,17 +126,30 @@ def create_classroom(db: Session, classroom_data: CreateClassroom):
     if not user:
         return None
     
-    new_classroom = Group(
-        group_name=classroom_data.name,
-        class_code=classroom_data.code,
-        owner_id= user.user_id,
-        created_at = datetime.now(timezone.utc)
-    )
+
     try:
+       # 1. Create classroom first
+        new_classroom = Group(
+            group_name=classroom_data.name,
+            class_code=classroom_data.code,
+            owner_id=user.user_id,
+            created_at=datetime.now(timezone.utc)
+        )
         db.add(new_classroom)
         db.commit()
-        db.refresh(new_classroom)
-        return new_classroom
+        db.refresh(new_classroom)  # now new_classroom.id is available
+
+        # 2. Now add teacher as member
+        teacher_member = GroupMembers(
+            group_id=new_classroom.id,  # ← id is valid now
+            user_id=user.user_id,
+            joined_at=datetime.now(timezone.utc)
+        )
+        db.add(teacher_member)
+        db.commit()
+
+        return new_classroom, None
+
     except SQLAlchemyError as e:
         db.rollback()
         return None, str(e)
@@ -151,12 +164,14 @@ def join_classroom(db: Session, classroom_data: JoinClassroom):
     classroom = db.query(Group).filter(Group.class_code == classroom_data.code).first()
     if not classroom:
         return None, "Classroom not found"
+    
+    # Check if user is the owner
+    if classroom.owner_id == user.user_id:
+        return None, "You are the owner of this classroom"
 
     # Check if user is already a member of the classroom
-    group_member = db.query(GroupMembers).filter(
-        GroupMembers.user_id == user.user_id,
-        GroupMembers.group_id == classroom.id
-    ).first()
+    group_member = db.query(GroupMembers).filter(GroupMembers.user_id == user.user_id, GroupMembers.group_id == classroom.id).first()
+
     if group_member:
         return None, "User is already a member of this classroom"
 
@@ -169,7 +184,8 @@ def join_classroom(db: Session, classroom_data: JoinClassroom):
         db.add(new_group_member)
         db.commit()
         db.refresh(new_group_member)
-        return new_group_member
+        return new_group_member, None
+    
     except SQLAlchemyError as e:
         db.rollback()
         return None, str(e)   

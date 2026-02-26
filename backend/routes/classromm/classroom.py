@@ -34,8 +34,8 @@ async def created_classroom( request: Request, classroom_data: CreateClassroom, 
         1. Validate input data
         2. Create classroom entry in database
         3. Return success response """
-    classroom = create_classroom(db, classroom_data)
-    if not classroom:
+    classroom, error = create_classroom(db, classroom_data)
+    if error:
         return error_response(message="Failed to create classroom.", status_code=400)
     
     logger.info("Classroom created successfully")
