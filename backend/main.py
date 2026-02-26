@@ -5,16 +5,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 #  files import
 from utils.responses import success_response, error_response
-from backend.utils.exceptions import add_exception_handlers
+from utils.exceptions import add_exception_handlers
 from databases.session import get_db
 import routes.auth as auth
 import routes.quizzes.quiz as quizzes
 import routes.quizzes.questions as question
 import routes.quizzes.scores as score
+import routes.classromm.classroom as classroom
 import models.models as models
 from databases.database import  engine
 from logs.logs import get_logger
+# web socket imports
 from web_sockets.exam_socket import exam_room_socket
+from web_sockets.classroom_socket import classroom_room_socket
 
 
 logger = get_logger(__name__)
@@ -39,8 +42,10 @@ app.add_middleware(
 models.model.metadata.create_all(bind=engine) #Creates tables automatically if they don’t exist
 
 app.include_router(auth.auth_route) 
+app.include_router(classroom.classroom_route)
 app.include_router(quizzes.quiz_route)
 app.include_router(question.questions_route)
+
 
 print("\n===== REGISTERED ROUTES =====")
 for r in app.routes:
@@ -57,6 +62,11 @@ print("============================\n")
 @app.websocket("/ws/exam/{exam_id}")
 async def websocket_endpoint(ws: WebSocket, exam_id: int, db: Session = Depends(get_db) ):
     await exam_room_socket(ws, exam_id, db)
+
+
+@app.websocket("/ws/classroom/{classroom_id}")
+async def classroom_websocket_endpoint(ws: WebSocket, classroom_id: int, db: Session = Depends(get_db) ):
+    await classroom_room_socket(ws, classroom_id, db)
 
 # -------------- Route for invalid data format ------------
 @app.exception_handler(RequestValidationError)

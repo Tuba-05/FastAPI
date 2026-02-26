@@ -6,8 +6,7 @@ from fastapi.security import HTTPAuthorizationCredentials
 # sqlalchemy imports
 from sqlalchemy.orm import Session
 # files imports
-from backend.crud import crud
-from crud.crud import login_user, register_user, update_password, logout_user
+from crud.crud import create_token_entry, login_user, register_user, update_password, logout_user
 from models.models import User
 from databases.session import get_db
 from schemas.auth_schemas import UserRegister, UserEmail, PasswordUpdate, UserLogin, VerifyOtp
@@ -40,17 +39,18 @@ def register( request: Request, user_data: UserRegister, db: Session = Depends(g
         Hashes password before saving.
         Rate limited to 5 requests per minute per IP. """
     # saving user
-    register_user = register_user(db, user_data)
-    if not register_user:
+    registered_user, error = register_user(db, user_data)
+    if error:
         return error_response(message="User with this email already exists.", status_code=409)
 
     logger.info("User registered successfully")
-    return success_response(message="User registered successfully", data={"email": register_user.new_user.email}, 
+    return success_response(message="User registered successfully", data={"email": registered_user.email}, 
                                 status_code=201)
+
 
 # ---------------- Login ---------------------
 @auth_route.post("/users/login/")
-@limiter.limit("5/minute")  # Limit login attempts to 5 requests per minute per IP
+@limiter.limit("15/minute")  # Limit login attempts to 5 requests per minute per IP
 async def login( request: Request, user_data: UserLogin, db: Session = Depends(get_db)):
     """ Authenticates a user and returns a JWT access token.
         Steps:
@@ -58,20 +58,26 @@ async def login( request: Request, user_data: UserLogin, db: Session = Depends(g
         2. Verify password using pwblib
         3. Generate and return JWT token """
     
-    login_user = login_user(db, user_data.email, user_data.password)
-        
-    if not login_user:
+    logined_user = login_user(db, user_data)
+    print(f"Login attempt for email: {user_data.email}")    
+    if not logined_user:
         return error_response( message="Invalid email or password", status_code=401,)
         
     # Create JWT token containing user identity data
-    access_token = create_access_token(data={"sub": str(login_user.user.id)})
+    access_token = create_access_token(data={"sub": str(logined_user.id)})
 
-    refresh_token = create_refresh_token({ "user_id": login_user.user.id })
+    refresh_token = create_refresh_token({ "user_id": logined_user.id })
+    db_refresh_token = create_token_entry(db, logined_user.id, refresh_token, access_token)
+    
+    if not db_refresh_token:
+        return error_response(message="Failed to create refresh token", status_code=500)
+
 
     logger.info("User logged in successfully")
-    return success_response("Suceesfully logged in.", data= {"email": login_user.user.email, 
-                                                                 "username": login_user.user.name,
-                                                                "access_token": access_token,}, 
+    return success_response("Suceesfully logged in.", data= {"email": logined_user.email, 
+                                                                 "username": logined_user.name,
+                                                                "access_token": access_token,
+                                                                "refresh_token": refresh_token,}, 
                                                         status_code=200)
 
 
@@ -80,12 +86,12 @@ async def login( request: Request, user_data: UserLogin, db: Session = Depends(g
 @limiter.limit("5/minute")
 async def logout( request: Request,user_email: UserEmail, db: Session= Depends(get_db)):
         
-    logout_user = logout_user(db, user_email.email)
-    if not logout_user: 
+    loggedout_user = logout_user(db, user_email.email)
+    if not loggedout_user: 
         return error_response(message= "User not found", status_code= 404)
     
     logger.info("User logged out successfully")
-    return success_response("Logged out successfully", data={"email": logout_user.user.email}, status_code=200)
+    return success_response("Logged out successfully", data={"email": loggedout_user.email}, status_code=200)
     
 
 # ---------------- Generate Otp ---------------------    
@@ -104,7 +110,6 @@ async def get_otp(request: Request, user_data: UserEmail, db: Session = Depends(
         return success_response("Otp has been generated and sent to your email.", status_code=201)
     return error_response("Something went wrong", status_code=404)
     
-
 
 # ---------------- Update Password ---------------------    
 @auth_route.post("/users/update-password")

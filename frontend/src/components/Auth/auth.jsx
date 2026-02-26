@@ -56,7 +56,7 @@ const auth = () => {
           localStorage.setItem("userEmail", data.data.email); // user email 
           localStorage.setItem("access_token", data.data.access_token)
           alert(data.message); // login sucessful
-          navigate("/Exam-Room"); // navigate to HmPg
+          navigate("/classjoin"); // navigate to HmPg
         } else {
           alert(data.message); // login not sucessful
         }
