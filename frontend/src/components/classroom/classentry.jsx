@@ -28,10 +28,13 @@ const ClassroomEntry = () => {
         const res  = await fetch("http://localhost:8000/online-exams/classroom/join", {
           method:  "POST",
           headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token_id}` },
-          body:    JSON.stringify({ code: joincode }),
+          body:    JSON.stringify({ code: joincode, token_id: token_id }),
         });
         const data = await res.json();
         if (data.success) {
+          localStorage.setItem("class_code", joincode); // Store class code for later use in classroom
+          localStorage.setItem("classroom_id", data.data.classroom_id); // Store classroom ID for later use
+          localStorage.setItem("token_id", data.data.token_id); // Store token ID for later use
           setSuccess(true);
           navigate("/classjoin");
         } else {
@@ -43,10 +46,13 @@ const ClassroomEntry = () => {
         const res  = await fetch("http://localhost:8000/online-exams/classroom/create", {
           method:  "POST",
           headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token_id}` },
-          body:    JSON.stringify({ name: className, code: classCode }),
+          body:    JSON.stringify({ name: className, code: classCode , token_id: token_id}),
         });
         const data = await res.json();
         if (data.success) {
+          localStorage.setItem("class_code", classCode); // Store class code for later use in classroom
+          localStorage.setItem("classroom_id", data.data.classroom_id); // Store classroom ID for later use
+          localStorage.setItem("token_id", data.data.token_id); // Store token ID for later use
           setSuccess(true);
           navigate("/classcreate");
         } else {

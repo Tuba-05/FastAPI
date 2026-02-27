@@ -1,5 +1,5 @@
 from fastapi import WebSocket, WebSocketDisconnect, Depends
-from models.models import GroupMembers
+from models.models import GroupMembers, Group
 from utils.security import get_user_from_token
 from sqlalchemy.orm import Session
 from databases.session import get_db
@@ -58,24 +58,30 @@ class ClassroomManager:
 # Global manager instance
 manager = ClassroomManager()
 
-async def classroom_room_socket(ws: WebSocket, classroom_id: int, db: Session = Depends(get_db)):
-    token = ws.query_params.get("token")
+async def classroom_room_socket(ws: WebSocket, classroom_code: str, db: Session = Depends(get_db)):
+    # Get token from query params or function argument
+    from urllib.parse import unquote
+    token = unquote(ws.query_params.get("token", ""))
     
+    name_of_room = db.query(Group).filter(Group.class_code == classroom_code).first()
     # Manual DB Session handling for WebSockets
-    room_name = f"classroom_{classroom_id}"
+    room_name = f"classroom_{name_of_room.group_name}_{name_of_room.id}"  # unique room name based on classroom id and name
     try:
         user = get_user_from_token(token, db)
         if not user:
             await ws.close(code=1008)
             return
-        # Add this check
-        is_member = db.query(GroupMembers).filter(
-            GroupMembers.user_id == user.id,
-            GroupMembers.group_id == classroom_id
-        ).first()
+        
+        # checking enrollement status of the user in the classroom
+        is_member = db.query(GroupMembers).filter(GroupMembers.user_id == user.id, GroupMembers.group_id == name_of_room.id).first()
+
         if not is_member:
             await ws.close(code=1008)
             return
+
+        # ✅ Mark user as online
+        is_member.is_online = True
+        db.commit()    
 
         await manager.connect(ws, room_name, user.name)
 
@@ -88,15 +94,23 @@ async def classroom_room_socket(ws: WebSocket, classroom_id: int, db: Session = 
 
         while True:
             data = await ws.receive_json()
-            if data["action"] == "some_action":
-                # you could save submission to DB here
+            if data["action"] == "count_students":
                 await manager.broadcast(room_name, {
-                    "type": "some_type",
-                    "username" : user.name,
-                    "message": f"{user.name} did some action"
-                })
+                    "type": "count",
+                    "active_students": manager.get_member_count(room_name),
+                    "tapped_by": user.name  # ✅ who tapped
+                })    
             
     except WebSocketDisconnect:
+        # ✅ Mark user as offline on disconnect
+        is_member = db.query(GroupMembers).filter(
+            GroupMembers.user_id == user.id,
+            GroupMembers.group_id == name_of_room.id
+        ).first()
+        if is_member:
+            is_member.is_online = False
+            db.commit()
+
         await manager.disconnect(ws, room_name)
         await manager.broadcast(room_name, {   # notifying others
         "type": "event",

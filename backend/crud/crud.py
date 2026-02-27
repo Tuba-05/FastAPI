@@ -173,7 +173,7 @@ def join_classroom(db: Session, classroom_data: JoinClassroom):
     group_member = db.query(GroupMembers).filter(GroupMembers.user_id == user.user_id, GroupMembers.group_id == classroom.id).first()
 
     if group_member:
-        return None, "User is already a member of this classroom"
+        return  group_member, "Already a member, rejoining"
 
     try:
         new_group_member = GroupMembers(

@@ -14,3 +14,8 @@ class JoinClassroom(BaseModel):
     token_id: str # user id
     code: str = Field(max_length=8, min_length=4)  # classroom code 
 
+
+# class ClassroomStats(BaseModel):
+#     online: int
+#     total_joined: int
+#     total_left: int

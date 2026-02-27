@@ -1,32 +1,37 @@
 import { useEffect, useRef, useState } from "react";
 
 export default function Classroom() {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(0); // Track number of students in room
   const [toast, setToast] = useState(null);
+  const [tapcount, settapcount] = useState(0); // Track number of times the button was tapped
   const [clicking, setClicking] = useState(false);
   const socketRef = useRef(null);
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");
+    console.log("Token for WebSocket:", token);
+    const classCode = localStorage.getItem("class_code");
     if (!token) {
       alert("Not authenticated");
       return;
     }
-
-    const ws = new WebSocket(
-      `ws://127.0.0.1:8000/ws/classroom/${localStorage.getItem("class_code")}?token=${token}`
-    );
+    const ws = new WebSocket( `ws://127.0.0.1:8000/ws/classroom/${classCode}?token=${encodeURIComponent(token)}`);
 
     socketRef.current = ws;
 
     ws.onopen = () => console.log("Connected to classroom");
 
     ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === "count") setCount(data.active_students);
-      if (data.type === "event") showToast(data.message);
-      if (data.type === "submission") showToast(data.message);
-    };
+    const data = JSON.parse(event.data);
+    
+    if (data.type === "count") {
+        setCount(data.active_students);
+        showToast(`${data.tapped_by} tapped! 👆`);  // ✅ tap message
+    }
+    if (data.type === "event") {
+        showToast(data.message);  // ✅ join/leave message
+    }
+  };
 
     ws.onerror = (err) => console.error("WebSocket error:", err);
     ws.onclose = () => console.log("Disconnected from classroom");
@@ -44,7 +49,7 @@ export default function Classroom() {
       // Trigger press animation
       setClicking(true);
       setTimeout(() => setClicking(false), 150);
-
+      settapcount(prev => prev + 1);  // ✅ increments on every press
       socketRef.current.send(JSON.stringify({ action: "count_students" }));
     }
   };
@@ -293,6 +298,7 @@ export default function Classroom() {
             </div>
           </button>
           <span className="btn-hint">Tap to count</span>
+          <div className={`count-number ${clicking ? "bump" : ""}`}>{tapcount}</div>
         </div>
 
         {/* Toast */}

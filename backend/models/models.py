@@ -52,10 +52,11 @@ class Group(model):
 
 class GroupMembers(model):
     __tablename__ = "group_members"
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True) # group membership id
     group_id = Column(Integer, ForeignKey("groups.id", ondelete="CASCADE"), nullable=False)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)    
     joined_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    is_online = Column(Boolean, default=False)
 
     # back_populates matches User.group_memberships
     user = relationship("User", back_populates="group_memberships")

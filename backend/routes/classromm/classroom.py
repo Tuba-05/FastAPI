@@ -39,8 +39,8 @@ async def created_classroom( request: Request, classroom_data: CreateClassroom, 
         return error_response(message="Failed to create classroom.", status_code=400)
     
     logger.info("Classroom created successfully")
-    return success_response(message="Classroom created successfully", data={"classroom_id": classroom.id}, 
-                                status_code=201)
+    return success_response(message="Classroom created successfully", data={"classroom_id": classroom.id, "token_id": classroom_data.token_id,
+                                                                            "class_code": classroom.class_code}, status_code=201)
 
 
 # 2. Join classroom route
@@ -53,10 +53,12 @@ async def joined_classroom( request: Request, classroom_data: JoinClassroom, db:
         2. Create classroom entry in database
         3. Return success response """
     classroom, error_msg = join_classroom(db, classroom_data)
-    if error_msg:
+    if classroom is None and error_msg:
         return error_response(message=error_msg, status_code=400)
+    if classroom and error_msg:  # user is already a member but we can still return success 
+        return success_response(message=error_msg, data={"classroom_id": classroom.id, "token_id": classroom_data.token_id}, status_code=200)
     
     logger.info("User joined classroom successfully")
-    return success_response(message="User joined classroom successfully", data={"classroom_id": classroom.id}, 
+    return success_response(message="User joined classroom successfully", data={"classroom_id": classroom.id, "token_id": classroom_data.token_id}, 
                                 status_code=200)
 

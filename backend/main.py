@@ -58,15 +58,23 @@ print("============================\n")
 # async def options_catch_all():
 #     return {}
 
+# ----- Reset online status of all users in classrooms on startup -----
+@app.on_event("startup")
+def reset_online_status():
+    db = next(get_db())
+    db.query(models.GroupMembers).update({"is_online": False})
+    db.commit()
+    db.close()
+
 # --------------- web socktes ---------------
 @app.websocket("/ws/exam/{exam_id}")
 async def websocket_endpoint(ws: WebSocket, exam_id: int, db: Session = Depends(get_db) ):
     await exam_room_socket(ws, exam_id, db)
 
 
-@app.websocket("/ws/classroom/{classroom_id}")
-async def classroom_websocket_endpoint(ws: WebSocket, classroom_id: int, db: Session = Depends(get_db) ):
-    await classroom_room_socket(ws, classroom_id, db)
+@app.websocket("/ws/classroom/{classroom_code}")
+async def classroom_websocket_endpoint(ws: WebSocket, classroom_code: str, db: Session = Depends(get_db) ):
+    await classroom_room_socket(ws, classroom_code, db)
 
 # -------------- Route for invalid data format ------------
 @app.exception_handler(RequestValidationError)
