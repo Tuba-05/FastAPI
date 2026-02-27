@@ -1,10 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Auth from './components/auth/auth.jsx';
+import AuthPage from './components/auth/auth.jsx';
 import ExamRoom from './components/sockets/exam_room.jsx';
 import VeriCode from './components/VeriCode/VeriCode.jsx';
-import Classjoin from "./components/classroom/classentry.jsx";
-import Createclassroom from "./components/classroom/createdclassroom.jsx";
-// import TeacherRoom from './components/teacher_room/teacher_room.jsx';
+import Classentry from "./components/classroom/classentry.jsx";
 
 function App() {
 
@@ -12,11 +10,10 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Auth/>} ></Route>
+          <Route path="/" element={<AuthPage/>} ></Route>
           <Route path="Exam-Room" element={<ExamRoom />}></Route>
           <Route path="/VeriCode" element={<VeriCode/>}></Route>
-          <Route path="/classjoin" element={<Classjoin/>}></Route>
-          <Route path="/createclassroom" element={<Createclassroom/>}></Route>
+          <Route path="/classentry" element={<Classentry/>}></Route>
         </Routes>
       </BrowserRouter>  
     </>
