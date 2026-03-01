@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import AuthPage from './components/auth/auth.jsx';
+import AuthPage from './components/Auth/auth.jsx';
 import ExamRoom from './components/sockets/exam_room.jsx';
 import VeriCode from './components/VeriCode/VeriCode.jsx';
 import Classentry from "./components/classroom/classentry.jsx";

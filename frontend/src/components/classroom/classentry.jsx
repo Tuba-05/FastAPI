@@ -115,13 +115,13 @@ const ClassroomEntry = () => {
 
         .card {
           position: relative; z-index: 1;
-          background: rgba(255,255,255,0.028);
-          border: 1px solid rgba(255,255,255,0.07);
+          background: rgb(200, 199, 203);
+          border: 1px solid rgba(46, 155, 180, 0.89);
           border-radius: 28px;
           padding: 52px 44px;
           width: 100%; max-width: 500px;
           backdrop-filter: blur(24px);
-          box-shadow: 0 40px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+          box-shadow: 0 40px 80px rgba(128, 123, 123, 0.58), inset 0 1px 0 rgba(255,255,255,0.05);
           animation: up 0.55s cubic-bezier(0.16,1,0.3,1) both;
         }
 
@@ -142,7 +142,7 @@ const ClassroomEntry = () => {
         }
         .logo-icon {
           width: 36px; height: 36px;
-          background: linear-gradient(135deg, #6366f1, #8b5cf6);
+          background: linear-gradient(135deg, #121214, #8b5cf6);
           border-radius: 10px;
           display: flex; align-items: center; justify-content: center;
           font-size: 1rem;
@@ -150,24 +150,24 @@ const ClassroomEntry = () => {
         .logo-name {
           font-family: 'Syne', sans-serif;
           font-weight: 700; font-size: 1rem;
-          color: rgba(255,255,255,0.7);
+          color: rgba(89, 40, 174, 0.85);
           letter-spacing: 0.02em;
         }
 
         .heading {
           font-family: 'Syne', sans-serif;
           font-size: 2.1rem; font-weight: 800;
-          color: #fff; line-height: 1.15;
+          color: #100e0e; line-height: 1.15;
           margin-bottom: 10px;
         }
         .heading span {
-          background: linear-gradient(135deg, #818cf8, #ec4899);
+          background: linear-gradient(135deg, #3345e6, #ec4899);
           -webkit-background-clip: text; -webkit-text-fill-color: transparent;
           background-clip: text;
         }
         .sub {
-          color: rgba(255,255,255,0.35);
-          font-size: 0.9rem; font-weight: 300;
+          color: rgba(0, 0, 0, 0.81);
+          font-size: 0.9rem; font-weight: 500;
           line-height: 1.6; margin-bottom: 36px;
         }
 
@@ -176,8 +176,8 @@ const ClassroomEntry = () => {
           gap: 14px; margin-bottom: 0;
         }
         .mode-card {
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(255,255,255,0.08);
+          background: rgba(100, 90, 101, 0.15);
+          border: 1px solid rgba(138, 91, 167, 0.18);
           border-radius: 18px;
           padding: 24px 20px;
           cursor: pointer;
@@ -193,33 +193,34 @@ const ClassroomEntry = () => {
         .mode-title {
           font-family: 'Syne', sans-serif;
           font-size: 1rem; font-weight: 700;
-          color: #fff; margin-bottom: 4px;
+          color: #7a57d5; margin-bottom: 4px;
         }
-        .mode-desc { font-size: 0.78rem; color: rgba(255,255,255,0.3); line-height: 1.5; font-weight: 300; }
-        .mode-arrow { display: inline-block; margin-top: 14px; color: rgba(99,102,241,0.6); font-size: 0.8rem; font-weight: 500; letter-spacing: 0.04em; }
+        .mode-desc { font-size: 0.78rem; color: rgba(15, 13, 13, 0.59); line-height: 1.5; font-weight: 500; }
+        .mode-arrow { display: inline-block; margin-top: 14px; color: rgba(161, 99, 241, 0.74); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.04em; }
 
         .back-btn {
           display: inline-flex; align-items: center; gap: 6px;
           background: none; border: none;
-          color: rgba(255,255,255,0.3);
+          color: rgba(23, 21, 21, 0.78);
           font-family: 'DM Sans', sans-serif;
-          font-size: 0.82rem; cursor: pointer;
+          font-size: 0.82rem; cursor: pointer; font-weight: 500;
           padding: 0; margin-bottom: 28px;
           transition: color 0.2s;
         }
-        .back-btn:hover { color: rgba(255,255,255,0.7); }
+        .back-btn:hover { color: rgba(80, 9, 118, 0.7); }
 
         .mode-badge {
-          display: inline-flex; align-items: center; gap: 7px;
-          padding: 5px 13px; border-radius: 100px;
-          font-size: 0.72rem; font-weight: 500;
+    
+          display: inline-flex; align-items: center; gap: 9px;
+          padding: 3px 9px; border-radius: 100px;
+          font-size: 0.72rem; font-weight: 600;
           letter-spacing: 0.08em; text-transform: uppercase;
-          margin-bottom: 22px;
+          margin-bottom: 20px;
         }
         .mode-badge.join  { background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.25); color: #818cf8; }
         .mode-badge.create { background: rgba(236,72,153,0.12); border: 1px solid rgba(236,72,153,0.25); color: #f472b6; }
         .badge-dot { width: 6px; height: 6px; border-radius: 50%; animation: pulse 2s ease infinite; }
-        .join .badge-dot { background: #818cf8; }
+        .join .badge-dot { background: #7330b7; }
         .create .badge-dot { background: #f472b6; }
         @keyframes pulse {
           0%,100% { opacity:1; transform:scale(1); }
@@ -228,8 +229,8 @@ const ClassroomEntry = () => {
 
         .field { margin-bottom: 14px; }
         .field label {
-          display: block; color: rgba(255,255,255,0.4);
-          font-size: 0.75rem; font-weight: 500;
+          display: block; color: rgba(17, 11, 11, 0.93);
+          font-size: 0.85rem; font-weight: 600;
           letter-spacing: 0.07em; text-transform: uppercase;
           margin-bottom: 8px;
         }
@@ -237,17 +238,17 @@ const ClassroomEntry = () => {
         .field-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 0.95rem; pointer-events: none; }
         .field input {
           width: 100%;
-          background: rgba(255,255,255,0.05);
+          background: rgba(43, 6, 54, 0.05);
           border: 1px solid rgba(255,255,255,0.09);
           border-radius: 13px;
           padding: 14px 16px 14px 44px;
-          color: #fff; font-size: 0.95rem;
+          color: #231616; font-size: 0.95rem;
           font-family: 'DM Sans', sans-serif;
           font-weight: 400; outline: none; transition: all 0.2s;
         }
-        .field input::placeholder { color: rgba(255,255,255,0.18); }
+        .field input::placeholder { color: rgba(25, 11, 11, 0.86); }
         .field input:focus {
-          border-color: rgba(99,102,241,0.45);
+          border-color: rgba(86, 47, 176, 0.86);
           background: rgba(99,102,241,0.06);
           box-shadow: 0 0 0 3px rgba(99,102,241,0.08);
         }
@@ -274,7 +275,7 @@ const ClassroomEntry = () => {
           letter-spacing: 0.03em; color: #fff; cursor: pointer;
           position: relative; overflow: hidden; transition: all 0.2s; margin-top: 6px;
         }
-        .submit-btn.join-btn   { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+        .submit-btn.join-btn   { background: linear-gradient(135deg, #151752, #8b5cf6); }
         .submit-btn.create-btn { background: linear-gradient(135deg, #db2777, #ec4899); }
         .submit-btn::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent); opacity: 0; transition: opacity 0.2s; }
         .submit-btn:hover::before { opacity: 1; }
@@ -315,7 +316,7 @@ const ClassroomEntry = () => {
         <div className="card">
           <div className="logo">
             <div className="logo-icon">🎓</div>
-            <span className="logo-name">Clarix</span>
+            <span className="logo-name">GradeGate<span> X </span></span>
           </div>
 
           {/* ── Success ── */}

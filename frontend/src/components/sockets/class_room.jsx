@@ -104,7 +104,7 @@ export default function Classroom() {
         .header h2 {
           font-family: 'Syne', sans-serif;
           font-size: 1rem; font-weight: 700;
-          color: rgba(255,255,255,0.3);
+          color: rgba(255, 255, 255, 0.76);
           letter-spacing: 0.15em; text-transform: uppercase;
           margin-bottom: 8px;
         }
@@ -112,7 +112,7 @@ export default function Classroom() {
           display: inline-flex; align-items: center; gap: 7px;
           background: rgba(99,102,241,0.12);
           border: 1px solid rgba(99,102,241,0.25);
-          color: #818cf8;
+          color: #959bd7;
           font-size: 0.72rem; font-weight: 500;
           letter-spacing: 0.1em; text-transform: uppercase;
           padding: 5px 13px; border-radius: 100px;
@@ -129,14 +129,14 @@ export default function Classroom() {
           animation: up 0.6s 0.1s cubic-bezier(0.16,1,0.3,1) both;
         }
         .count-label {
-          color: rgba(255,255,255,0.25);
+          color: rgba(255, 255, 255, 0.94);
           font-size: 0.78rem; font-weight: 500;
           letter-spacing: 0.12em; text-transform: uppercase;
           margin-bottom: 6px;
         }
         .count-number {
           font-family: 'Syne', sans-serif;
-          font-size: 5rem; font-weight: 800;
+          font-size: 3.5rem; font-weight: 800;
           background: linear-gradient(135deg, #fff 40%, rgba(255,255,255,0.4));
           -webkit-background-clip: text; -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -176,7 +176,7 @@ export default function Classroom() {
           content: '';
           position: absolute; inset: -6px;
           border-radius: 50%;
-          border: 1px solid rgba(99,102,241,0.2);
+          border: 1px solid rgba(99, 101, 241, 0.94);
           transition: all 0.15s ease;
         }
 
@@ -184,11 +184,11 @@ export default function Classroom() {
         .btn-face {
           position: absolute; inset: 0;
           border-radius: 50%;
-          background: linear-gradient(145deg, #4f52c8, #6366f1);
+          background: linear-gradient(145deg, #fdfdfd, #8b8b95);
           box-shadow:
-            0 8px 0 #3730a3,
+            0 8px 0 #a33086,
             0 12px 20px rgba(99,102,241,0.4),
-            inset 0 1px 0 rgba(255,255,255,0.15);
+            inset 0 1px 0 rgba(148, 82, 235, 0.96);
           display: flex; align-items: center; justify-content: center;
           transition: all 0.1s ease;
         }
@@ -230,7 +230,7 @@ export default function Classroom() {
         }
 
         .btn-hint {
-          color: rgba(255,255,255,0.2);
+          color: rgba(255, 255, 255, 0.89);
           font-size: 0.75rem; letter-spacing: 0.06em;
           text-transform: uppercase;
         }

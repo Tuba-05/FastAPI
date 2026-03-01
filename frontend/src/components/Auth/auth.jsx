@@ -46,11 +46,11 @@ const styles = `
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --p1: #3b1fa8;
-    --p2: #5b32d6;
-    --p3: #7c5ce8;
-    --p4: #a78bfa;
-    --p5: #c4b5fd;
+    --p1: #110e20;
+    --p2: #463183;
+    --p3: #8270bf;
+    --p4: #b58bfa; 
+    --p5: #4a3c80; 
     --p6: #ede9fe;
 
     --bg0: #07050f;
@@ -58,14 +58,14 @@ const styles = `
     --bg2: #130d30;
     --bg3: #1a1040;
 
-    --glass:        rgba(91, 50, 214, 0.08);
-    --glass-border: rgba(167, 139, 250, 0.22);
-    --glass-shine:  rgba(196, 181, 253, 0.45);
+    --glass:        rgba(255, 255, 255, 0.72);
+    --glass-border: rgba(34, 89, 196, 0.14);
+    --glass-shine:  rgba(255, 255, 255, 0.95);
     --glass-blur:   32px;
 
-    --txt1: #f0ecff;
-    --txt2: rgba(224, 214, 255, 0.7);
-    --txt3: rgba(196, 181, 253, 0.45);
+    --txt1: #20077c;
+    --txt2: rgb(7, 7, 9);
+    --txt3: rgba(4, 4, 4, 0.95);
 
     --inp-bg:    rgba(124, 92, 232, 0.09);
     --inp-bd:    rgba(167, 139, 250, 0.25);
@@ -172,9 +172,9 @@ const styles = `
     border-top-color: var(--glass-shine);
     border-radius: 26px;
     box-shadow:
-      0 0 0 1px rgba(124,92,232,0.1),
-      0 35px 80px rgba(7,5,15,0.9),
-      0 12px 35px rgba(0,0,0,0.5),
+      0 0 0 1px rgba(86, 164, 213, 0.75),
+      0 35px 80px rgba(171, 168, 183, 0.9),
+      0 12px 35px rgba(106, 101, 101, 0.5),
       inset 0 1px 0 rgba(196,181,253,0.14),
       inset 0 -1px 0 rgba(59,31,168,0.1);
     padding: 48px 44px 44px;
@@ -525,8 +525,7 @@ const styles = `
     .auth-card  { padding: 36px 28px 32px; border-radius: 20px; }
     .auth-title { font-size: 24px; }
     .auth-input { font-size: 16px; }
-  }
-`;
+  }`
 
 /* ── Component ── */
 export default function AuthPage() {
@@ -628,7 +627,7 @@ export default function AuthPage() {
 
             {/* Logo */}
             <div className="logo-mark">
-              <div className="logo-icon">💎</div>
+              <div className="logo-icon">🎓</div>
               <span className="logo-text">GradeGate<span> X </span></span>
             </div>
 
