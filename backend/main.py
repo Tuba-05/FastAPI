@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, WebSocket, Depends
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 # sqlalchemy imports
 from sqlalchemy.orm import Session
 #  files import
@@ -23,7 +24,25 @@ from web_sockets.classroom_socket import classroom_room_socket
 logger = get_logger(__name__)
 logger.info("Application startup") 
 
-app = FastAPI() # app
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # ✅ Startup: runs before the app starts
+    db = next(get_db())
+    try:
+        db.query(models.GroupMembers).update({"is_online": False}, synchronize_session=False)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        print(f"Startup reset failed: {e}")
+    finally:
+        db.close()
+
+    yield  # ← app runs here
+
+    # ✅ Shutdown: runs when app stops (optional, add cleanup here if needed)
+
+# Pass lifespan to FastAPI
+app = FastAPI(lifespan=lifespan)
 add_exception_handlers(app)
 
 # origins = [ "http://localhost:5173", 
@@ -62,9 +81,14 @@ print("============================\n")
 @app.on_event("startup")
 def reset_online_status():
     db = next(get_db())
-    db.query(models.GroupMembers).update({"is_online": False})
-    db.commit()
-    db.close()
+    try:
+        db.query(models.GroupMembers).update({"is_online": False}, synchronize_session=False)  # ✅
+        db.commit()  # ✅ must commit
+    except Exception as e:
+        db.rollback()  # ✅ rollback on failure
+        print(f"Startup reset failed: {e}")
+    finally:
+        db.close()  # ✅ always close
 
 # --------------- web socktes ---------------
 @app.websocket("/ws/exam/{exam_id}")

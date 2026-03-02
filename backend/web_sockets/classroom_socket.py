@@ -33,10 +33,12 @@ class ClassroomManager:
 
     async def broadcast(self, room: str, message: dict):
         if room in self.rooms:
-            for connection in self.rooms[room]:
-                await connection.send_json(message)
+            import asyncio # ✅ import asyncio for concurrent sends
+            await asyncio.gather(*[conn.send_json(message) for conn in self.rooms[room]])
+            # for connection in self.rooms[room]:
+            #     await connection.send_json(message)
 
-    async def get_stats(self, room: str) -> dict:
+    def get_stats(self, room: str) -> dict:
         stats = self.room_stats.get(room, {"total_joined": 0, "total_left": 0, "tap_count": 0})
         return {
             "online": len(self.rooms.get(room, [])),
@@ -44,14 +46,14 @@ class ClassroomManager:
             "total_left": stats["total_left"],
         }
 
-    async def get_member_count(self, room: str) -> int:
+    def get_member_count(self, room: str) -> int:
         return len(self.rooms.get(room, []))
 
-    async def get_member_names(self, room: str) -> list:
+    def get_member_names(self, room: str) -> list:
         return [self.usernames[ws] for ws in self.rooms.get(room, [])]
 
     
-    async def increment_tap(self, room: str) -> int:
+    def increment_tap(self, room: str) -> int:
         if room not in self.room_stats:
             self.room_stats[room] = {"total_joined": 0, "total_left": 0, "tap_count": 0}
         self.room_stats[room]["tap_count"] += 1
@@ -76,6 +78,8 @@ async def classroom_room_socket(ws: WebSocket, classroom_code: str, db: Session 
 
     # ✅ Consistent room key using classroom_code directly
     room_name = f"classroom_{classroom_code}"
+    user = None
+    is_member = None  # ✅ cache it
 
     try:
         user = get_user_from_token(token, db)
@@ -123,13 +127,7 @@ async def classroom_room_socket(ws: WebSocket, classroom_code: str, db: Session 
 
     except WebSocketDisconnect:
         # ✅ Mark user as offline
-        is_member = db.query(GroupMembers).filter(
-            GroupMembers.user_id == user.id,
-            GroupMembers.group_id == classroom.id
-        ).first()
-        if is_member:
-            is_member.is_online = False
-            db.commit()
+        
 
         await manager.disconnect(ws, room_name)
         await manager.broadcast(room_name, {
