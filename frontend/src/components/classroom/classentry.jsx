@@ -54,7 +54,9 @@ const ClassroomEntry = () => {
           localStorage.setItem("classroom_id", data.data.classroom_id); // Store classroom ID for later use
           localStorage.setItem("token_id", data.data.token_id); // Store token ID for later use
           setSuccess(true);
-          navigate("/classcreate");
+          setTimeout(() => reset(), 2000); // Optional: auto-reset after showing success message
+          setMode("join");
+          navigate("/classentry");
         } else {
           setError(data.message || "Failed to create the classroom.");
         }
@@ -272,7 +274,7 @@ const ClassroomEntry = () => {
         .submit-btn {
           width: 100%; padding: 15px; border: none; border-radius: 13px;
           font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700;
-          letter-spacing: 0.03em; color: #fff; cursor: pointer;
+          letter-spacing: 0.03em; color: #1b1818; cursor: pointer;
           position: relative; overflow: hidden; transition: all 0.2s; margin-top: 6px;
         }
         .submit-btn.join-btn   { background: linear-gradient(135deg, #151752, #8b5cf6); }
@@ -286,7 +288,7 @@ const ClassroomEntry = () => {
 
         .spinner {
           display: inline-block; width: 14px; height: 14px;
-          border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
+          border: 2px solid rgba(255,255,255,0.3); border-top-color: #000;
           border-radius: 50%; animation: spin 0.7s linear infinite;
           vertical-align: middle; margin-right: 8px;
         }
@@ -300,14 +302,14 @@ const ClassroomEntry = () => {
         }
         .success-ring.join   { background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.25); }
         .success-ring.create { background: rgba(236,72,153,0.12); border: 1px solid rgba(236,72,153,0.25); }
-        .success-title { font-family: 'Syne', sans-serif; font-size: 1.55rem; font-weight: 800; color: #fff; margin-bottom: 8px; }
+        .success-title { font-family: 'Syne', sans-serif; font-size: 1.55rem; font-weight: 800; color: #18063a; margin-bottom: 8px; }
         .success-sub { color: rgba(255,255,255,0.35); font-size: 0.88rem; margin-bottom: 28px; }
         .reset-btn {
           background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
           border-radius: 12px; padding: 11px 24px; color: rgba(255,255,255,0.5);
           font-family: 'DM Sans', sans-serif; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
         }
-        .reset-btn:hover { color: #fff; border-color: rgba(255,255,255,0.18); }
+        .reset-btn:hover { color: #130226; border-color: rgba(255,255,255,0.18); }
       `}</style>
 
       <div className="root">

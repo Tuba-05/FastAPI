@@ -167,7 +167,7 @@ def join_classroom(db: Session, classroom_data: JoinClassroom):
     
     # Check if user is the owner
     if classroom.owner_id == user.user_id:
-        return None, "You are the owner of this classroom"
+        return classroom, "You are the owner of this classroom"
 
     # Check if user is already a member of the classroom
     group_member = db.query(GroupMembers).filter(GroupMembers.user_id == user.user_id, GroupMembers.group_id == classroom.id).first()

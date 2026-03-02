@@ -26,10 +26,15 @@ export default function Classroom() {
     
     if (data.type === "count") {
         setCount(data.active_students);
+        settapcount(data.total_taps);  // ✅ use server's global tap count
         showToast(`${data.tapped_by} tapped! 👆`);  // ✅ tap message
     }
     if (data.type === "event") {
+        // setCount(data.active_students);
         showToast(data.message);  // ✅ join/leave message
+        setCount(data.active_students ?? 0);       
+        settapcount(data.total_taps ?? 0);              
+
     }
   };
 
@@ -279,7 +284,7 @@ export default function Classroom() {
         {/* Count */}
         <div className="count-display">
           <div className="count-label">Students in room</div>
-          <div className={`count-number ${clicking ? "bump" : ""}`}>{count}</div>
+          <div className={`count-number`}>{count}</div>
         </div>
 
         {/* Counter Button */}
@@ -290,8 +295,8 @@ export default function Classroom() {
             onMouseDown={() => setClicking(true)}
             onMouseUp={() => setClicking(false)}
             onMouseLeave={() => setClicking(false)}
-            onTouchStart={() => setClicking(true)}
-            onTouchEnd={() => { setClicking(false); submitExam(); }}
+            onTouchStart={(e) => { e.preventDefault(); setClicking(true); }}   // ✅ preventDefault stops onClick from firing too
+            onTouchEnd={(e) => { e.preventDefault(); setClicking(false); submitExam(); }}  // ✅ only fires once
           >
             <div className="btn-face">
               <span className="btn-icon">👥</span>
