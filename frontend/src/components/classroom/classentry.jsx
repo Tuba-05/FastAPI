@@ -1,7 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { getWorkingBaseURL } from "../UrlFetch/UrlFetch.jsx";
 
 const ClassroomEntry = () => {
+  const [BASE_URL, setBASE_URL] = useState(null);
+    useEffect(() => {
+      getWorkingBaseURL().then(url => {
+        setBASE_URL(url);
+      });
+    }, []);
+
+    
   const [mode, setMode]           = useState(null);
   const [joincode, setCode]       = useState("");
   const [className, setClassName] = useState("");
@@ -25,7 +34,8 @@ const ClassroomEntry = () => {
     try {
       if (mode === "join") {
         // API call — only fires when user submits join form
-        const res  = await fetch("http://localhost:8000/online-exams/classroom/join", {
+        
+        const res  = await fetch(`${BASE_URL}/online-exams/classroom/join`, {
           method:  "POST",
           headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token_id}` },
           body:    JSON.stringify({ code: joincode, token_id: token_id }),
@@ -43,7 +53,7 @@ const ClassroomEntry = () => {
 
       } else if (mode === "create") {
         // API call — only fires when user submits create form
-        const res  = await fetch("http://localhost:8000/online-exams/classroom/create", {
+        const res  = await fetch(`${BASE_URL}/online-exams/classroom/create`, {
           method:  "POST",
           headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token_id}` },
           body:    JSON.stringify({ name: className, code: classCode , token_id: token_id}),

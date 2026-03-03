@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { getWorkingBaseURL } from "../UrlFetch/UrlFetch.jsx";
 
 export default function Classroom() {
   const [count, setCount] = useState(0); // Track number of students in room
@@ -8,40 +9,73 @@ export default function Classroom() {
   const socketRef = useRef(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
-    console.log("Token for WebSocket:", token);
-    const classCode = localStorage.getItem("class_code");
-    if (!token) {
-      alert("Not authenticated");
-      return;
+    let isCancelled = false; // ← guard for async race
+    async function setupWebSocket() {
+      const BASE_URL = await getWorkingBaseURL();
+
+      if (isCancelled) return; // ← abort if effect was cleaned up during await
+
+      if (!BASE_URL) {
+        alert("Backend server not reachable");
+        return;
+      }
+
+      const token = localStorage.getItem("access_token");
+      console.log("Token for WebSocket:", token);
+      const classCode = localStorage.getItem("class_code");
+
+      if (!token) {
+        alert("Not authenticated");
+        return;
+      }
+
+      // Close any existing connection before opening a new one
+      if (socketRef.current) {
+        socketRef.current.close();
+        socketRef.current = null;
+      }
+      const wsURL = BASE_URL.replace(/^http/, "ws") +
+        `/ws/classroom/${classCode}?token=${encodeURIComponent(token)}`;
+      const ws = new WebSocket(wsURL);
+
+      socketRef.current = ws;
+
+      ws.onopen = () => console.log("Connected to classroom");
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+
+          if (data.type === "count") {
+            setCount(data.active_students);
+            settapcount(data.total_taps);  // ✅ use server's global tap count
+            showToast(`${data.tapped_by} tapped! 👆`);  // ✅ tap message
+          }
+          if (data.type === "event") {
+            // setCount(data.active_students);
+            showToast(data.message);  // ✅ join/leave message
+            setCount(data.active_students ?? 0);
+            settapcount(data.total_taps ?? 0);
+          }
+        } catch (e) {
+          console.error("WebSocket message parse error", e);
+        }
+      };
+
+      ws.onerror = (err) => console.error("WebSocket error:", err);
+      ws.onclose = () => console.log("Disconnected from classroom");
     }
-    const ws = new WebSocket( `ws://127.0.0.1:8000/ws/classroom/${classCode}?token=${encodeURIComponent(token)}`);
+    // return () => ws.close();
 
-    socketRef.current = ws;
+    setupWebSocket();
 
-    ws.onopen = () => console.log("Connected to classroom");
-
-    ws.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    
-    if (data.type === "count") {
-        setCount(data.active_students);
-        settapcount(data.total_taps);  // ✅ use server's global tap count
-        showToast(`${data.tapped_by} tapped! 👆`);  // ✅ tap message
+    return () => {
+      isCancelled = true; // ← prevent async setup from continuing
+      if (socketRef.current) {
+        socketRef.current.close();
+        socketRef.current = null;
+      }
     }
-    if (data.type === "event") {
-        // setCount(data.active_students);
-        showToast(data.message);  // ✅ join/leave message
-        setCount(data.active_students ?? 0);       
-        settapcount(data.total_taps ?? 0);              
-
-    }
-  };
-
-    ws.onerror = (err) => console.error("WebSocket error:", err);
-    ws.onclose = () => console.log("Disconnected from classroom");
-
-    return () => ws.close();
   }, []);
 
   const showToast = (msg) => {

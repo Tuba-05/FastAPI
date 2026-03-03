@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import {getWorkingBaseURL} from "../UrlFetch/UrlFetch.jsx";
 
 /* ── Inline icons (no extra deps needed) ── */
 const IconUser = () => (
@@ -529,6 +530,14 @@ const styles = `
 
 /* ── Component ── */
 export default function AuthPage() {
+  const [BASE_URL, setBASE_URL] = useState(null);
+  useEffect(() => {
+    getWorkingBaseURL().then(url => {
+      setBASE_URL(url);
+    });
+  }, []);
+
+  console.log("API Base URLs:", BASE_URL);
   const [isLogin, setIsLogin] = useState(true);
   const [showPw,  setShowPw]  = useState(false);
   const [showKey, setShowKey] = useState(false);
@@ -546,7 +555,7 @@ export default function AuthPage() {
       setLoading(true);
       if (isLogin) {
         if (!formData.email || !formData.password) { alert("Please fill all fields."); return; }
-        const response = await fetch("http://127.0.0.1:8000/online-exams/users/login/", {
+        const response = await fetch(`${BASE_URL}/online-exams/users/login/`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -568,7 +577,7 @@ export default function AuthPage() {
         }
       } else {
         if (!formData.username || !formData.email || !formData.password) { alert("Please fill all fields."); return; }
-        const response = await fetch("http://127.0.0.1:8000/online-exams/users/register", {
+        const response = await fetch(`${BASE_URL}/online-exams/users/register`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
