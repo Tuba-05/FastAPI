@@ -61,8 +61,8 @@ The frontend provides:
 - Answer validation logic
 - Exam session tracking
 
-#### Real-Time Exam Room
-- WebSocket-based exam room
+#### Real-Time Classroom Room
+- WebSocket-based classroom room
 - Real-time student connection
 - Live exam session handling
 - Server-side session state management
@@ -126,7 +126,7 @@ This system is designed to be suitable for academic institutions and online test
 
 ## Current Status
 
-The foundation of the system — authentication, exam logic, and real-time communication — has been successfully implemented.
+The foundation of the system — authentication, join/create classroom logic, and real-time communication — has been successfully implemented.
 The remaining work mainly involves UI completion, admin features, and production hardening.
 
 ---
