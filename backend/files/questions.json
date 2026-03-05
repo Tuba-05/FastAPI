@@ -1,0 +1,252 @@
+[
+  {
+    "question": "What is the capital of France?",
+    "options": ["Rome", "Madrid", "Paris", "Berlin"],
+    "answer": "Paris"
+  },
+  {
+    "question": "Which planet is known as the Red Planet?",
+    "options": ["Venus", "Mars", "Jupiter", "Saturn"],
+    "answer": "Mars"
+  },
+  {
+    "question": "What is the largest ocean on Earth?",
+    "options": ["Atlantic", "Indian", "Arctic", "Pacific"],
+    "answer": "Pacific"
+  },
+  {
+    "question": "Who wrote 'Romeo and Juliet'?",
+    "options": ["Charles Dickens", "William Shakespeare", "Mark Twain", "Jane Austen"],
+    "answer": "William Shakespeare"
+  },
+  {
+    "question": "What is the chemical symbol for water?",
+    "options": ["CO2", "H2O", "O2", "NaCl"],
+    "answer": "H2O"
+  },
+  {
+    "question": "Which element has the atomic number 1?",
+    "options": ["Helium", "Oxygen", "Hydrogen", "Carbon"],
+    "answer": "Hydrogen"
+  },
+  {
+    "question": "What is the smallest country in the world?",
+    "options": ["Monaco", "Nauru", "Vatican City", "San Marino"],
+    "answer": "Vatican City"
+  },
+  {
+    "question": "Which animal is known as the 'Ship of the Desert'?",
+    "options": ["Horse", "Camel", "Elephant", "Donkey"],
+    "answer": "Camel"
+  },
+  {
+    "question": "How many continents are there?",
+    "options": ["5", "6", "7", "8"],
+    "answer": "7"
+  },
+  {
+    "question": "What is the hardest natural substance on Earth?",
+    "options": ["Gold", "Iron", "Diamond", "Graphite"],
+    "answer": "Diamond"
+  },
+  {
+    "question": "Which country gifted the Statue of Liberty to the USA?",
+    "options": ["Germany", "France", "Italy", "England"],
+    "answer": "France"
+  },
+  {
+    "question": "What is the currency of Japan?",
+    "options": ["Yuan", "Won", "Yen", "Baht"],
+    "answer": "Yen"
+  },
+  {
+    "question": "Who painted the Mona Lisa?",
+    "options": ["Vincent van Gogh", "Pablo Picasso", "Leonardo da Vinci", "Claude Monet"],
+    "answer": "Leonardo da Vinci"
+  },
+  {
+    "question": "What is the longest river in the world?",
+    "options": ["Amazon", "Nile", "Yangtze", "Mississippi"],
+    "answer": "Nile"
+  },
+  {
+    "question": "Which gas do plants absorb from the atmosphere?",
+    "options": ["Oxygen", "Nitrogen", "Hydrogen", "Carbon Dioxide"],
+    "answer": "Carbon Dioxide"
+  },
+  {
+    "question": "How many colors are in a rainbow?",
+    "options": ["5", "6", "7", "8"],
+    "answer": "7"
+  },
+  {
+    "question": "What is the main ingredient in hummus?",
+    "options": ["Lentils", "Chickpeas", "Fava beans", "Black beans"],
+    "answer": "Chickpeas"
+  },
+  {
+    "question": "Which year did World War II end?",
+    "options": ["1918", "1939", "1945", "1950"],
+    "answer": "1945"
+  },
+  {
+    "question": "What is the boiling point of water at sea level?",
+    "options": ["90°C", "100°C", "110°C", "120°C"],
+    "answer": "100°C"
+  },
+  {
+    "question": "Which is the largest land animal?",
+    "options": ["Blue Whale", "Giraffe", "African Elephant", "Hippopotamus"],
+    "answer": "African Elephant"
+  },
+  {
+    "question": "What is the capital of Italy?",
+    "options": ["Venice", "Naples", "Milan", "Rome"],
+    "answer": "Rome"
+  },
+  {
+    "question": "How many legs does a spider have?",
+    "options": ["6", "8", "10", "12"],
+    "answer": "8"
+  },
+  {
+    "question": "Which metal is liquid at room temperature?",
+    "options": ["Silver", "Mercury", "Copper", "Aluminum"],
+    "answer": "Mercury"
+  },
+  {
+    "question": "Who was the first person to step on the Moon?",
+    "options": ["Buzz Aldrin", "Yuri Gagarin", "Neil Armstrong", "John Glenn"],
+    "answer": "Neil Armstrong"
+  },
+  {
+    "question": "What is the largest organ in the human body?",
+    "options": ["Liver", "Heart", "Skin", "Lungs"],
+    "answer": "Skin"
+  },
+  {
+    "question": "Which country is home to the Kangaroo?",
+    "options": ["South Africa", "Brazil", "Australia", "India"],
+    "answer": "Australia"
+  },
+  {
+    "question": "What is the square root of 64?",
+    "options": ["6", "7", "8", "9"],
+    "answer": "8"
+  },
+  {
+    "question": "In which city is the Eiffel Tower located?",
+    "options": ["London", "Paris", "Rome", "Barcelona"],
+    "answer": "Paris"
+  },
+  {
+    "question": "Which is the fastest land animal?",
+    "options": ["Lion", "Cheetah", "Leopard", "Tiger"],
+    "answer": "Cheetah"
+  },
+  {
+    "question": "What does DNA stand for?",
+    "options": ["Deoxyribonucleic acid", "Ribonucleic acid", "Diribonucleic acid", "Deoxyribo acid"],
+    "answer": "Deoxyribonucleic acid"
+  },
+  {
+    "question": "What is the capital of Canada?",
+    "options": ["Toronto", "Vancouver", "Ottawa", "Montreal"],
+    "answer": "Ottawa"
+  },
+  {
+    "question": "Which instrument is used to measure atmospheric pressure?",
+    "options": ["Thermometer", "Barometer", "Hygrometer", "Altimeter"],
+    "answer": "Barometer"
+  },
+  {
+    "question": "Who discovered penicillin?",
+    "options": ["Marie Curie", "Alexander Fleming", "Louis Pasteur", "Isaac Newton"],
+    "answer": "Alexander Fleming"
+  },
+  {
+    "question": "What is the smallest prime number?",
+    "options": ["1", "2", "3", "5"],
+    "answer": "2"
+  },
+  {
+    "question": "Which desert is the largest in the world?",
+    "options": ["Sahara", "Gobi", "Kalahari", "Arabian"],
+    "answer": "Sahara"
+  },
+  {
+    "question": "What is the national fruit of India?",
+    "options": ["Apple", "Banana", "Mango", "Orange"],
+    "answer": "Mango"
+  },
+  {
+    "question": "Which organ pumps blood throughout the body?",
+    "options": ["Lungs", "Brain", "Heart", "Liver"],
+    "answer": "Heart"
+  },
+  {
+    "question": "What is the capital of Spain?",
+    "options": ["Barcelona", "Madrid", "Seville", "Valencia"],
+    "answer": "Madrid"
+  },
+  {
+    "question": "How many minutes are in an hour?",
+    "options": ["40", "50", "60", "100"],
+    "answer": "60"
+  },
+  {
+    "question": "Which is the most spoken language in the world?",
+    "options": ["Spanish", "English", "Mandarin", "Hindi"],
+    "answer": "English"
+  },
+  {
+    "question": "What is the chemical symbol for Gold?",
+    "options": ["Ag", "Au", "Fe", "Pb"],
+    "answer": "Au"
+  },
+  {
+    "question": "Which planet is closest to the Sun?",
+    "options": ["Venus", "Earth", "Mercury", "Mars"],
+    "answer": "Mercury"
+  },
+  {
+    "question": "Who is known as the 'Father of Computers'?",
+    "options": ["Bill Gates", "Charles Babbage", "Steve Jobs", "Alan Turing"],
+    "answer": "Charles Babbage"
+  },
+  {
+    "question": "What is the capital of Germany?",
+    "options": ["Munich", "Frankfurt", "Hamburg", "Berlin"],
+    "answer": "Berlin"
+  },
+  {
+    "question": "How many sides does a hexagon have?",
+    "options": ["5", "6", "7", "8"],
+    "answer": "6"
+  },
+  {
+    "question": "Which gas is most abundant in Earth's atmosphere?",
+    "options": ["Oxygen", "Nitrogen", "Carbon Dioxide", "Argon"],
+    "answer": "Nitrogen"
+  },
+  {
+    "question": "What is the tallest mountain in the world?",
+    "options": ["K2", "Kangchenjunga", "Mount Everest", "Lhotse"],
+    "answer": "Mount Everest"
+  },
+  {
+    "question": "In which year did the Titanic sink?",
+    "options": ["1905", "1912", "1918", "1923"],
+    "answer": "1912"
+  },
+  {
+    "question": "What is the capital of Australia?",
+    "options": ["Sydney", "Melbourne", "Canberra", "Perth"],
+    "answer": "Canberra"
+  },
+  {
+    "question": "Which vitamin is produced when exposed to sunlight?",
+    "options": ["Vitamin A", "Vitamin B", "Vitamin C", "Vitamin D"],
+    "answer": "Vitamin D"
+  }
+]
