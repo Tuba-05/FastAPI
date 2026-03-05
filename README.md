@@ -5,7 +5,7 @@ The system is being developed using **FastAPI** for the backend and **React.js**
 
 > **Project Status:**  
 > Backend core logic is largely implemented.  
-> Frontend currently supports Authentication (Login/Signup) and Student Exam Room.  
+> Frontend currently supports Authentication (Login/Signup), Create/Join Classroom.  
 > The project is under active development.
 
 ---
@@ -61,8 +61,8 @@ The frontend provides:
 - Answer validation logic
 - Exam session tracking
 
-#### Real-Time Exam Room
-- WebSocket-based exam room
+#### Real-Time Classroom Room
+- WebSocket-based classroom room
 - Real-time student connection
 - Live exam session handling
 - Server-side session state management
@@ -80,13 +80,23 @@ The frontend provides:
 - Login page
 - Signup page
 - Token-based authentication flow
+- Simple HTTP-based
 - API integration with backend
 
-#### Student Exam Room
-- Dedicated exam interface for students
-- API-driven exam loading
-- WebSocket connection to backend exam room
-- Real-time exam environment
+#### Student/Teacher Join/Create Classroom Module
+- Simple HTTP-based classroom creation and joining functionality  
+- Backend API-driven classroom management  
+- Basic responsive classroom interface  
+- Supports user authentication before classroom access  
+- Lightweight design without complex real-time streaming logic
+
+#### Student Classroom Module
+- Real-time classroom interface for students  
+- Displays live student participation count  
+- Supports tap interaction logic for student engagement  
+- WebSocket-based real-time updates from backend server  
+- Instant synchronization of classroom events  
+- Lightweight and responsive live environment for students  
 
 ---
 
@@ -116,7 +126,7 @@ This system is designed to be suitable for academic institutions and online test
 
 ## Current Status
 
-The foundation of the system — authentication, exam logic, and real-time communication — has been successfully implemented.
+The foundation of the system — authentication, join/create classroom logic, and real-time communication — has been successfully implemented.
 The remaining work mainly involves UI completion, admin features, and production hardening.
 
 ---
